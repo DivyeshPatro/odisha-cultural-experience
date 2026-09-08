@@ -109,7 +109,7 @@ function ListenOdisha() {
 
       <section className="listen__stage" aria-live="polite">
         <div className={`voiceprint ${speaking ? 'is-speaking' : ''}`} aria-hidden="true">
-          {Array.from({ length: 28 }, (_, index) => <span key={index} style={{ ['--bar' as string]: index }} />)}
+          {Array.from({ length: 28 }, (_, index) => <span key={index} style={{ '--bar': index } as React.CSSProperties} />)}
         </div>
         <p className="listen__note">{PHRASES[active].note}</p>
         <p className="listen__odia" lang="or">{PHRASES[active].odia}</p>
@@ -149,10 +149,11 @@ const MINUTE_STORIES = [
   { time: '53', title: 'Preparedness became power', stat: '1.2 million moved', body: 'Before Cyclone Fani in 2019, Odisha evacuated roughly 1.2 million people. Its disaster model is now studied internationally.', tone: 'lagoon' },
 ]
 
+const SIXTY_DURATION = 60000
+
 function SixtySecondOdisha() {
   const [elapsed, setElapsed] = useState(0)
   const [playing, setPlaying] = useState(false)
-  const duration = 60000
   const active = Math.min(MINUTE_STORIES.length - 1, Math.floor(elapsed / 7500))
   const story = MINUTE_STORIES[active]
 
@@ -172,9 +173,9 @@ function SixtySecondOdisha() {
           next = nextBoundary - 1
         }
         
-        if (next >= duration) {
+        if (next >= SIXTY_DURATION) {
           setPlaying(false)
-          return duration
+          return SIXTY_DURATION
         }
         return next
       })
@@ -202,7 +203,7 @@ function SixtySecondOdisha() {
   const toggle = () => {
     if (playing) setPlaying(false)
     else {
-      if (elapsed >= duration) setElapsed(0)
+      if (elapsed >= SIXTY_DURATION) setElapsed(0)
       setPlaying(true)
     }
   }
@@ -215,8 +216,8 @@ function SixtySecondOdisha() {
           <h1>Odisha in 60 seconds</h1>
           <p className="xodia" lang="or">ଷାଠିଏ ସେକେଣ୍ଡରେ ଓଡ଼ିଶା</p>
         </div>
-        <div className="minute__clock" style={{ ['--progress' as string]: `${elapsed / duration}` }}>
-          <span>{Math.max(0, Math.ceil((duration - elapsed) / 1000))}</span><small>seconds</small>
+        <div className="minute__clock" style={{ '--progress': `${elapsed / SIXTY_DURATION}` } as React.CSSProperties}>
+          <span>{Math.max(0, Math.ceil((SIXTY_DURATION - elapsed) / 1000))}</span><small>seconds</small>
         </div>
       </header>
 
@@ -234,7 +235,7 @@ function SixtySecondOdisha() {
         </button>
       </section>
 
-      <div className="minute__progress" aria-hidden="true"><span style={{ width: `${(elapsed / duration) * 100}%` }} /></div>
+      <div className="minute__progress" aria-hidden="true"><span style={{ width: `${(elapsed / SIXTY_DURATION) * 100}%` }} /></div>
       <nav className="minute__chapters" aria-label="One-minute chapters">
         {MINUTE_STORIES.map((item, index) => (
           <button key={item.title} type="button" className={index === active ? 'is-active' : ''} onClick={() => { setPlaying(false); setElapsed(index * 7500) }}>
@@ -279,7 +280,7 @@ function FolkOdisha() {
   const [volume, setVolume] = useState(200)
   const audio = useRef<AudioContext | null>(null)
   const volumeRef = useRef(2.0)
-  const timer = useRef(0)
+  const timer = useRef<any>(0)
   const form = FOLK_FORMS[selected]
 
   const stopRhythm = () => {
@@ -358,7 +359,7 @@ function FolkOdisha() {
         <p className="folk__intro">Not one folk tradition, but many landscapes moving differently: western fields, southern hills, coastal akhadas and temple towns.</p>
       </header>
 
-      <section className="folkstage" style={{ ['--folk-accent' as string]: form.accent }}>
+      <section className="folkstage" style={{ '--folk-accent': form.accent } as React.CSSProperties}>
         <div className="folkstage__art"><ArtPlate name={form.plate} accent={form.accent} /></div>
         <div className="folkstage__copy">
           <p className="folkstage__region">{form.region}</p>
