@@ -147,11 +147,26 @@ function SixtySecondOdisha() {
 
   useEffect(() => {
     if (!playing) return
-    const started = performance.now() - elapsed
+    let lastTick = performance.now()
     const timer = window.setInterval(() => {
-      const next = Math.min(duration, performance.now() - started)
-      setElapsed(next)
-      if (next >= duration) setPlaying(false)
+      const now = performance.now()
+      const delta = now - lastTick
+      lastTick = now
+      setElapsed((prev) => {
+        let next = prev + delta
+        const currentBox = Math.floor(prev / 7500)
+        const nextBoundary = (currentBox + 1) * 7500
+        
+        if (next >= nextBoundary && window.speechSynthesis?.speaking) {
+          next = nextBoundary - 1
+        }
+        
+        if (next >= duration) {
+          setPlaying(false)
+          return duration
+        }
+        return next
+      })
     }, 50)
     return () => window.clearInterval(timer)
   }, [playing])
@@ -166,7 +181,7 @@ function SixtySecondOdisha() {
     window.speechSynthesis.cancel()
     const utterance = new SpeechSynthesisUtterance(`${story.title}. ${story.body}`)
     utterance.lang = 'or-IN'
-    utterance.rate = 0.95
+    utterance.rate = 1.25
     utterance.volume = 1.0
     window.speechSynthesis.speak(utterance)
   }, [active, playing, story.title, story.body])
@@ -357,7 +372,7 @@ function FolkOdisha() {
               id="rhythm-volume"
               type="range"
               min="50"
-              max="150"
+              max="250"
               step="5"
               value={volume}
               onChange={(event) => {
