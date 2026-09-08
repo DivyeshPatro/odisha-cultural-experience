@@ -5,7 +5,7 @@ import { WheelArt } from './components/KonarkWheel'
 import { Frieze, LotusMark } from './components/Motifs'
 import './styles/qr.css'
 
-const BASE_URL = 'https://divyeshp-glitch-ui.github.io/odisha-cultural-experience/'
+const BASE_URL = 'https://divyeshpatro.github.io/odisha-cultural-experience/'
 
 const FACTS = [
   { value: '24', label: 'stone wheels at Konark', tone: 'gold' },

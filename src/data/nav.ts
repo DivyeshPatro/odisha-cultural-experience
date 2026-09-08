@@ -21,7 +21,8 @@ export const CHAPTERS: Chapter[] = [
   { id: 'nature', numeral: 'IX', label: 'Wild', line: 'Dolphins, crocodiles, black tigers, half a million turtles.' },
   { id: 'resilience', numeral: 'X', label: 'Resilience', line: 'How a state cut a cyclone’s death toll by three orders of magnitude.' },
   { id: 'modern', numeral: 'XI', label: 'Odisha Now', line: 'Missiles, hockey, ore, and an exported method.' },
-  { id: 'india', numeral: 'XII', label: 'One India', line: 'Where this all joins the larger story.' },
+  { id: 'more', numeral: 'XII', label: 'More Experiences', line: 'Three standalone interactive explorations.' },
+  { id: 'india', numeral: 'XIII', label: 'One India', line: 'Where this all joins the larger story.' },
 ]
 
 /** Shown inline in the top bar on wide screens. */

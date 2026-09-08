@@ -75,7 +75,7 @@ export function useAmbience(): Ambience {
       ]
 
       const bus = ctx.createGain()
-      bus.gain.value = 0.5
+      bus.gain.value = 1.0
       bus.connect(master.gain.value > 0 ? master : ctx.destination)
 
       for (const [ratio, g, decay] of partials) {
@@ -139,7 +139,7 @@ export function useAmbience(): Ambience {
 
     master.gain.cancelScheduledValues(ctx.currentTime)
     master.gain.setValueAtTime(master.gain.value, ctx.currentTime)
-    master.gain.linearRampToValueAtTime(0.16, ctx.currentTime + 1.6)
+    master.gain.linearRampToValueAtTime(0.80, ctx.currentTime + 1.6)
 
     surfRef.current = {
       stop: () => {
@@ -194,6 +194,28 @@ export function useAmbience(): Ambience {
     document.addEventListener('visibilitychange', onVis)
     return () => document.removeEventListener('visibilitychange', onVis)
   }, [playing])
+
+  // Automatically start audio on the first user interaction
+  useEffect(() => {
+    if (!supported) return
+    const onInteract = () => {
+      start()
+      document.removeEventListener('click', onInteract)
+      document.removeEventListener('scroll', onInteract)
+      document.removeEventListener('touchstart', onInteract)
+      document.removeEventListener('keydown', onInteract)
+    }
+    document.addEventListener('click', onInteract, { once: true })
+    document.addEventListener('scroll', onInteract, { once: true })
+    document.addEventListener('touchstart', onInteract, { once: true })
+    document.addEventListener('keydown', onInteract, { once: true })
+    return () => {
+      document.removeEventListener('click', onInteract)
+      document.removeEventListener('scroll', onInteract)
+      document.removeEventListener('touchstart', onInteract)
+      document.removeEventListener('keydown', onInteract)
+    }
+  }, [supported, start])
 
   useEffect(
     () => () => {

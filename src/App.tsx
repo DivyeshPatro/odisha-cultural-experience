@@ -13,6 +13,7 @@ import { NatureSection } from './sections/NatureSection'
 import { ResilienceSection } from './sections/ResilienceSection'
 import { ModernSection } from './sections/ModernSection'
 import { OneIndiaSection } from './sections/OneIndiaSection'
+import { MoreExperiencesSection } from './sections/MoreExperiencesSection'
 import { Footer } from './sections/Footer'
 
 export default function App() {
@@ -35,6 +36,7 @@ export default function App() {
           <NatureSection />
           <ResilienceSection />
           <ModernSection />
+          <MoreExperiencesSection />
           <OneIndiaSection />
         </main>
         <Footer />

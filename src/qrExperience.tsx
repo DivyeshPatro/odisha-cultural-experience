@@ -4,7 +4,7 @@ import { ArtPlate, type ArtPlateName } from './components/Plates'
 import { Frieze, LotusMark, SauraBand } from './components/Motifs'
 import './styles/qr-experiences.css'
 
-const BASE_URL = 'https://divyeshp-glitch-ui.github.io/odisha-cultural-experience/'
+const BASE_URL = 'https://divyeshpatro.github.io/odisha-cultural-experience/'
 type AudioWindow = Window & typeof globalThis & { webkitAudioContext?: typeof AudioContext }
 const getAudioConstructor = () => window.AudioContext ?? (window as AudioWindow).webkitAudioContext
 
@@ -39,7 +39,7 @@ function strikeBell() {
   const now = context.currentTime
   const bus = context.createGain()
   const compressor = context.createDynamicsCompressor()
-  bus.gain.setValueAtTime(0.9, now)
+  bus.gain.setValueAtTime(1.8, now)
   bus.gain.exponentialRampToValueAtTime(0.0001, now + 4.5)
   compressor.threshold.value = -16
   compressor.knee.value = 10
@@ -233,9 +233,9 @@ function FolkOdisha() {
   const [selected, setSelected] = useState(0)
   const [rhythm, setRhythm] = useState<string | null>(null)
   const [beat, setBeat] = useState(-1)
-  const [volume, setVolume] = useState(125)
+  const [volume, setVolume] = useState(200)
   const audio = useRef<AudioContext | null>(null)
-  const volumeRef = useRef(1.25)
+  const volumeRef = useRef(2.0)
   const timer = useRef(0)
   const form = FOLK_FORMS[selected]
 
