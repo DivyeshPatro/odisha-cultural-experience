@@ -1,0 +1,1035 @@
+/* ==================================================================
+   COMPONENTS
+   ================================================================== */
+
+:root {
+  /* One fractal-noise tile, inlined. No network request for the grain. */
+  --grain-url: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
+}
+
+/* ================= NAV ================= */
+.nav {
+  position: fixed;
+  inset: 0 0 auto;
+  /* Above the chapter overlay (95). The overlay used to cover the very
+     button that dismisses it, which left no way out on a phone short of
+     scrolling to the bottom of twelve chapters. */
+  z-index: 100;
+  transition: background var(--dur) var(--ease-out), border-color var(--dur) var(--ease-out);
+  border-bottom: 1px solid transparent;
+}
+.nav.is-menu {
+  background: rgba(8, 6, 5, 0.97);
+  border-bottom-color: var(--rule-soft);
+}
+.nav.is-menu .nav__links {
+  visibility: hidden;
+}
+.nav.is-scrolled {
+  background: rgba(11, 9, 7, 0.82);
+  backdrop-filter: blur(14px) saturate(1.2);
+  -webkit-backdrop-filter: blur(14px) saturate(1.2);
+  border-bottom-color: var(--rule-soft);
+}
+.nav__bar {
+  height: var(--nav-h);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.nav__brand {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  color: var(--gold);
+  padding: 0.4rem 0.2rem;
+  margin-inline-start: -0.2rem;
+}
+.nav__wordmark {
+  font-family: var(--font-display);
+  font-size: 0.98rem;
+  letter-spacing: 0.3em;
+  color: var(--cream);
+}
+.nav__odia {
+  font-size: 0.8rem;
+  color: var(--gold);
+  opacity: 0.75;
+}
+@media (max-width: 400px) {
+  .nav__odia {
+    display: none;
+  }
+}
+
+.nav__links {
+  display: none;
+  margin-inline: auto;
+  gap: 0.25rem;
+}
+/* Raised from 1040px: the Present control took enough room that the six
+   inline chapter links wrapped onto two lines between 1040 and 1180. */
+@media (min-width: 1200px) {
+  .nav__links {
+    display: flex;
+  }
+}
+.nav__link {
+  position: relative;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+  transition: color var(--dur-fast) var(--ease-out);
+}
+.nav__link:hover {
+  color: var(--cream);
+}
+.nav__link.is-active {
+  color: var(--gold);
+}
+.nav__link.is-active::after {
+  content: '';
+  position: absolute;
+  left: 0.75rem;
+  right: 0.75rem;
+  bottom: 0.15rem;
+  height: 1px;
+  background: currentColor;
+}
+
+.nav__tools {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  margin-inline-start: auto;
+}
+.nav__sound,
+.nav__menu {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 40px;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--rule-soft);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast);
+}
+.nav__sound:hover,
+.nav__menu:hover {
+  color: var(--cream);
+  border-color: var(--rule);
+  background: rgba(224, 165, 72, 0.06);
+}
+.nav__sound.is-on {
+  color: var(--gold);
+  border-color: var(--rule);
+}
+.nav__soundlabel,
+.nav__menulabel {
+  display: none;
+}
+@media (min-width: 560px) {
+  .nav__soundlabel,
+  .nav__menulabel {
+    display: inline;
+  }
+}
+.nav__burger {
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 4px;
+  width: 16px;
+  height: 12px;
+}
+.nav__burger i {
+  display: block;
+  height: 1.5px;
+  background: currentColor;
+  transition: transform var(--dur-fast) var(--ease-out), opacity var(--dur-fast);
+}
+.nav__burger.is-x i:first-child {
+  transform: translateY(2.75px) rotate(45deg);
+}
+.nav__burger.is-x i:last-child {
+  transform: translateY(-2.75px) rotate(-45deg);
+}
+
+.nav__progress {
+  height: 1.5px;
+  background: rgba(224, 165, 72, 0.1);
+}
+.nav__progress span {
+  display: block;
+  height: 100%;
+  background: linear-gradient(90deg, var(--gold-deep), var(--gold-bright));
+  transform-origin: 0 50%;
+}
+
+/* ================= ROLLING SCROLL WHEEL =================
+   One fixed element in two layouts. Below 900px it rides the hairline
+   under the nav bar, where it cannot land on body text; above, it rolls
+   down the right margin. */
+.srail {
+  --sw-size: 34px;
+  --p: 0;
+  --rot: 0deg;
+  position: fixed;
+  z-index: 92;
+  /* Horizontal along the bottom edge. It was tried riding the nav's
+     hairline, but the wheel got clipped by the bar, and raising it
+     above would have let it slide over the Sound and Chapters buttons.
+     Down here it collides with nothing and is thumb-reachable. */
+  bottom: env(safe-area-inset-bottom, 0px);
+  top: auto;
+  left: 0;
+  width: 100%;
+  height: var(--sw-size);
+  touch-action: none;
+}
+.srail::before {
+  content: '';
+  position: absolute;
+  inset: -14px 0 0;
+  background: linear-gradient(to top, rgba(8, 6, 5, 0.92), transparent);
+  pointer-events: none;
+}
+.srail__track,
+.srail__fill {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  height: 1.5px;
+  translate: 0 -50%;
+  pointer-events: none;
+}
+.srail__track {
+  width: 100%;
+  background: rgba(224, 165, 72, 0.1);
+}
+.srail__fill {
+  width: calc(var(--p) * 100%);
+  background: linear-gradient(90deg, var(--gold-deep), var(--gold-bright));
+}
+.srail__wheel {
+  position: absolute;
+  top: 50%;
+  left: calc(var(--p) * (100% - var(--sw-size)));
+  width: var(--sw-size);
+  height: var(--sw-size);
+  translate: 0 -50%;
+  display: grid;
+  place-items: center;
+  cursor: grab;
+  touch-action: none;
+}
+.srail__wheel:active {
+  cursor: grabbing;
+}
+.mkw {
+  width: 100%;
+  height: 100%;
+  rotate: var(--rot);
+  filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.7));
+  transition: scale var(--dur-fast) var(--ease-out);
+}
+.srail__wheel:hover .mkw,
+.srail__wheel:focus-visible .mkw {
+  scale: 1.12;
+}
+
+.mkw-rim {
+  fill: var(--ink-900);
+  stroke: var(--gold);
+  stroke-width: 5;
+}
+.mkw-rim2 {
+  fill: none;
+  stroke: rgba(224, 165, 72, 0.4);
+  stroke-width: 1.6;
+}
+.mkw-stud {
+  fill: var(--gold-bright);
+}
+.mkw-major {
+  fill: var(--gold);
+}
+.mkw-minor {
+  fill: rgba(224, 165, 72, 0.55);
+}
+.mkw-hub {
+  fill: var(--gold-deep);
+  stroke: var(--gold);
+  stroke-width: 2;
+}
+.mkw-petal {
+  fill: var(--gold-bright);
+}
+.mkw-axle {
+  fill: var(--ink-900);
+}
+
+/* The vertical rail only appears once the layout actually has a margin
+   to put it in. `.wrap` is capped at 1220px, so below ~1340px there is
+   no free gutter and the wheel would sit on top of the text — at which
+   point it stays horizontal under the nav instead. */
+@media (min-width: 1340px) {
+  .srail {
+    --sw-size: 46px;
+    top: 14vh;
+    bottom: 12vh;
+    left: auto;
+    right: max(10px, calc((100vw - 1220px) / 2 - 52px));
+    width: var(--sw-size);
+    height: auto;
+  }
+  .srail::before {
+    display: none;
+  }
+  .srail__track,
+  .srail__fill {
+    top: 0;
+    left: 50%;
+    width: 1.5px;
+    height: 100%;
+    translate: -50% 0;
+  }
+  .srail__fill {
+    width: 1.5px;
+    height: calc(var(--p) * 100%);
+    background: linear-gradient(var(--gold-deep), var(--gold-bright));
+  }
+  .srail__wheel {
+    top: calc(var(--p) * (100% - var(--sw-size)));
+    left: 0;
+    translate: 0;
+  }
+}
+
+/* The wheel is a progress indicator as well as a control, so it stays —
+   but nothing about it should move if motion is unwelcome. */
+@media (prefers-reduced-motion: reduce) {
+  .mkw {
+    rotate: 0deg;
+  }
+}
+
+/* ================= SLIDE FEEL + PRESENT MODE =================
+   `proximity`, never `mandatory`: chapters run to four screens on a
+   phone, and mandatory snapping on sections taller than the viewport
+   makes their middles unreachable. Proximity gives the deck-like settle
+   at each chapter start and otherwise leaves scrolling alone. */
+@media (min-width: 700px) and (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-snap-type: y proximity;
+  }
+  .section,
+  .hero {
+    scroll-snap-align: start;
+    scroll-snap-stop: normal;
+  }
+}
+
+.presbtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 40px;
+  padding: 0.4rem 0.8rem;
+  border: 1px solid var(--rule-soft);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast);
+}
+.presbtn:hover {
+  color: var(--cream);
+  border-color: var(--rule);
+  background: rgba(224, 165, 72, 0.06);
+}
+.presbtn span {
+  display: none;
+}
+@media (min-width: 700px) {
+  .presbtn span {
+    display: inline;
+  }
+}
+
+.presbar {
+  position: fixed;
+  z-index: 110;
+  left: 50%;
+  bottom: calc(env(safe-area-inset-bottom, 0px) + 46px);
+  translate: -50% 0;
+  display: flex;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.35rem 0.4rem 0.35rem 0.5rem;
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  background: rgba(10, 8, 6, 0.94);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: var(--shadow-2);
+  overflow: hidden;
+  max-width: calc(100vw - 1.5rem);
+}
+.presbar__nav,
+.presbar__play,
+.presbar__tool {
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--parchment);
+  text-decoration: none;
+  transition: background var(--dur-fast), color var(--dur-fast);
+}
+.presbar__nav:hover:not(:disabled),
+.presbar__play:hover,
+.presbar__tool:hover {
+  background: rgba(224, 165, 72, 0.14);
+  color: var(--gold-bright);
+}
+.presbar__nav:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+.presbar__play.is-on {
+  color: var(--gold-bright);
+  background: rgba(224, 165, 72, 0.14);
+}
+.presbar__now {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding-inline: 0.35rem;
+  min-width: 0;
+  color: var(--gold);
+}
+.presbar__num {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  color: var(--gold-deep);
+}
+.presbar__label {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  color: var(--cream);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.presbar__count {
+  font-size: 0.66rem;
+  letter-spacing: 0.12em;
+  color: var(--text-muted);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+.presbar__exit {
+  padding: 0 0.75rem;
+  height: 40px;
+  border-radius: 999px;
+  font-size: 0.64rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--text-muted);
+}
+.presbar__exit:hover {
+  color: var(--cream);
+}
+/* A hairline that fills over the dwell time, so the room can see when
+   the next chapter is coming. */
+.presbar__tick {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  height: 2px;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: linear-gradient(90deg, var(--gold-deep), var(--gold-bright));
+}
+@media (prefers-reduced-motion: no-preference) {
+  .presbar__tick.is-running {
+    animation: presTick 16s linear;
+  }
+}
+@keyframes presTick {
+  to {
+    transform: scaleX(1);
+  }
+}
+
+/* While presenting, the rolling wheel would sit under the deck bar. */
+html[data-present] .srail {
+  opacity: 0.25;
+  pointer-events: none;
+}
+html[data-present] .nav__brand,
+html[data-present] .nav__links,
+html[data-present] .nav__sound,
+html[data-present] .nav__menu,
+html[data-present] .nav__progress {
+  opacity: 0;
+  pointer-events: none;
+}
+html[data-present] .section,
+html[data-present] .hero {
+  scroll-margin-top: 0;
+}
+@media (min-width: 1340px) {
+  html[data-present] .srail {
+    opacity: 1;
+    pointer-events: auto;
+  }
+}
+@media (min-width: 700px) {
+  .presbar {
+    bottom: calc(env(safe-area-inset-bottom, 0px) + 22px);
+  }
+}
+@media (max-width: 620px) {
+  .srail {
+    --sw-size: 28px;
+  }
+  html[data-present] .srail {
+    opacity: 0;
+  }
+  .presbar {
+    width: calc(100vw - 1rem);
+    justify-content: center;
+    padding-inline: 0.25rem;
+  }
+  .presbar__tool {
+    display: none;
+  }
+  .presbar__now svg,
+  .presbar__num {
+    display: none;
+  }
+  .presbar__now {
+    flex: 1;
+    justify-content: center;
+    gap: 0.35rem;
+  }
+  .presbar__exit {
+    padding-inline: 0.45rem;
+  }
+}
+
+/* ================= CHAPTER MENU ================= */
+.chmenu {
+  position: fixed;
+  inset: 0;
+  z-index: 95;
+  background: rgba(8, 6, 5, 0.96);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  animation: fade-in var(--dur) var(--ease-out);
+}
+@keyframes fade-in {
+  from {
+    opacity: 0;
+  }
+}
+.chmenu__inner {
+  padding-block: calc(var(--nav-h) + 1.5rem) 3rem;
+}
+.chmenu__eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 1.2rem;
+}
+.chmenu__list {
+  display: grid;
+  gap: 2px;
+  list-style: none;
+  padding: 0;
+}
+@media (min-width: 820px) {
+  .chmenu__list {
+    grid-template-columns: 1fr 1fr;
+    column-gap: 2rem;
+  }
+}
+.chmenu__list li {
+  animation: menu-in 420ms var(--ease-out) backwards;
+  animation-delay: calc(var(--i) * 26ms);
+}
+@keyframes menu-in {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .chmenu__list li {
+    animation: none;
+  }
+}
+.chmenu__item {
+  display: flex;
+  align-items: baseline;
+  gap: 1rem;
+  width: 100%;
+  min-height: 56px;
+  padding: 0.85rem 0.6rem;
+  text-align: left;
+  border-bottom: 1px solid var(--rule-soft);
+  transition: background var(--dur-fast), padding-left var(--dur-fast);
+}
+.chmenu__item:hover,
+.chmenu__item:focus-visible {
+  background: rgba(224, 165, 72, 0.05);
+  padding-left: 1rem;
+}
+.chmenu__item.is-active .chmenu__label {
+  color: var(--gold);
+}
+.chmenu__num {
+  flex: 0 0 2.2rem;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--gold-deep);
+  letter-spacing: 0.08em;
+}
+.chmenu__label {
+  display: block;
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  color: var(--cream);
+}
+.chmenu__line {
+  display: block;
+  font-size: var(--step--1);
+  color: var(--text-muted);
+  margin-top: 0.15rem;
+}
+.chmenu__close {
+  margin-top: 2rem;
+}
+
+/* ================= SECTION HEADER ================= */
+.sechead {
+  max-width: 62ch;
+  margin-bottom: clamp(1.4rem, 0.7rem + 3vw, 3.6rem);
+}
+.sechead--center {
+  margin-inline: auto;
+  text-align: center;
+}
+.sechead__eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.66rem;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  color: var(--gold);
+  margin-bottom: 0.7rem;
+}
+.sechead--center .sechead__eyebrow {
+  justify-content: center;
+}
+.sechead__numeral {
+  font-family: var(--font-display);
+  letter-spacing: 0.1em;
+  color: var(--gold-deep);
+}
+.sechead__title {
+  font-size: var(--step-3);
+  color: var(--cream);
+}
+.sechead__lede {
+  margin-top: 0.8rem;
+  font-size: var(--step-1);
+  line-height: 1.5;
+  font-weight: 300;
+  color: var(--text-dim);
+}
+
+/* ================= COUNTER ================= */
+.counter {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: 'tnum';
+}
+
+/* ================= SOURCE TAG ================= */
+.srctag {
+  margin-top: 0.9rem;
+  font-size: 0.72rem;
+}
+.srctag > summary {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 40px;
+  padding: 0.4rem 0.8rem 0.4rem 0.65rem;
+  border: 1px solid var(--rule-soft);
+  border-radius: 999px;
+  color: var(--text-muted);
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  cursor: pointer;
+  list-style: none;
+  transition: color var(--dur-fast), border-color var(--dur-fast);
+}
+.srctag > summary::-webkit-details-marker {
+  display: none;
+}
+.srctag > summary:hover {
+  color: var(--cream);
+  border-color: var(--rule);
+}
+.srctag__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--lagoon-soft);
+}
+.srctag--interpretation .srctag__dot {
+  background: var(--gold);
+}
+.srctag--contested .srctag__dot {
+  background: var(--sindoor-soft);
+}
+.srctag__count {
+  /* Was 0.55, which pushed this below 4.5:1 against the panel. */
+  opacity: 0.8;
+  font-size: 0.66rem;
+}
+.srctag[open] > summary {
+  color: var(--cream);
+  border-color: var(--rule);
+}
+.srctag__body {
+  margin-top: 0.7rem;
+  padding: 0.85rem 1rem;
+  border-left: 2px solid var(--rule);
+  background: rgba(0, 0, 0, 0.28);
+  border-radius: 0 3px 3px 0;
+}
+.srctag__caveat {
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: var(--parchment-dim);
+  margin-bottom: 0.8rem;
+}
+.srctag--contested .srctag__caveat {
+  color: #e6b3a8;
+}
+.srctag__list {
+  display: grid;
+  gap: 0.55rem;
+  list-style: none;
+  padding: 0;
+}
+.srctag__list a {
+  display: flex;
+  gap: 0.55rem;
+  align-items: flex-start;
+  font-size: 0.76rem;
+  line-height: 1.5;
+  color: var(--text-dim);
+  text-decoration: none;
+  transition: color var(--dur-fast);
+}
+.srctag__list a:hover {
+  color: var(--gold-bright);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.srctag__list strong {
+  font-weight: 500;
+  color: var(--cream);
+}
+.srctag__tier {
+  flex: 0 0 auto;
+  padding: 0.1rem 0.4rem;
+  border-radius: 2px;
+  font-size: 0.58rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  background: rgba(47, 143, 134, 0.18);
+  color: var(--lagoon-soft);
+}
+.srctag__tier--academic {
+  background: rgba(43, 74, 122, 0.28);
+  color: #8fb2e0;
+}
+.srctag__tier--press {
+  background: rgba(143, 122, 93, 0.2);
+  color: var(--parchment-dim);
+}
+
+/* ================= SHEET ================= */
+.sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+}
+@media (min-width: 760px) {
+  .sheet {
+    align-items: center;
+    padding: 2rem;
+  }
+}
+.sheet__scrim {
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 5, 4, 0.78);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: fade-in var(--dur) var(--ease-out);
+}
+.sheet__panel {
+  position: relative;
+  width: min(720px, 100%);
+  max-height: min(88dvh, 900px);
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(170deg, #241d16, #100d0a 65%);
+  border: 1px solid var(--rule);
+  border-bottom: 0;
+  border-radius: 14px 14px 0 0;
+  box-shadow: var(--shadow-2);
+  animation: sheet-up 380ms var(--ease-out);
+  transition: transform 220ms var(--ease-out);
+}
+@media (min-width: 760px) {
+  .sheet__panel {
+    border-bottom: 1px solid var(--rule);
+    border-radius: 8px;
+  }
+}
+.sheet__panel::before {
+  content: '';
+  position: absolute;
+  inset: 0 0 auto;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--sheet-accent), transparent);
+  border-radius: 14px 14px 0 0;
+}
+@keyframes sheet-up {
+  from {
+    transform: translateY(28px);
+    opacity: 0;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sheet__panel,
+  .sheet__scrim {
+    animation: none;
+  }
+}
+.sheet__grab {
+  display: flex;
+  justify-content: center;
+  padding: 0.7rem 0 0.2rem;
+  touch-action: none;
+  cursor: grab;
+}
+.sheet__grab span {
+  width: 42px;
+  height: 4px;
+  border-radius: 99px;
+  background: var(--stone-400);
+}
+@media (min-width: 760px) {
+  .sheet__grab {
+    display: none;
+  }
+}
+.sheet__close {
+  position: absolute;
+  top: 0.55rem;
+  right: 0.65rem;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  color: var(--text-dim);
+  background: rgba(0, 0, 0, 0.3);
+  transition: color var(--dur-fast), background var(--dur-fast);
+}
+.sheet__close:hover {
+  color: var(--cream);
+  background: rgba(224, 165, 72, 0.14);
+}
+.sheet__scroll {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  padding: 0.6rem clamp(1.15rem, 4vw, 2.2rem) clamp(1.6rem, 5vw, 2.4rem);
+  -webkit-overflow-scrolling: touch;
+}
+.sheet__eyebrow {
+  font-size: 0.7rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--sheet-accent);
+  margin-bottom: 0.5rem;
+}
+.sheet__title {
+  font-size: var(--step-3);
+  color: var(--cream);
+  margin-bottom: 1.2rem;
+  padding-right: 2.5rem;
+}
+
+.sheetbody h4 {
+  margin-top: 1.5rem;
+  margin-bottom: 0.4rem;
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--gold);
+}
+.sheetbody p {
+  color: var(--text-dim);
+  line-height: 1.72;
+  max-width: 62ch;
+}
+.sheetbody__hook {
+  font-family: var(--font-display);
+  font-size: var(--step-1);
+  color: var(--cream) !important;
+  line-height: 1.4 !important;
+  padding-left: 0.9rem;
+  border-left: 2px solid var(--sheet-accent);
+}
+.sheetbody__plate {
+  width: min(240px, 60%);
+  margin: 0 auto 1.4rem;
+}
+.sheetbody__list {
+  display: grid;
+  gap: 1.4rem;
+  list-style: none;
+  padding: 0;
+  margin-top: 1.4rem;
+}
+
+/* ================= PLATES ================= */
+.plate {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1;
+  background: radial-gradient(120% 100% at 30% 20%, rgba(53, 44, 34, 0.5), rgba(11, 9, 7, 0.85));
+  border-radius: 3px;
+}
+.plate__cap {
+  font-family: var(--font-body);
+  font-size: 8px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  fill: var(--gold);
+  opacity: 0.75;
+}
+.plate--patta .plate__cap {
+  font-family: var(--font-odia);
+  text-transform: none;
+  letter-spacing: 0.04em;
+  font-size: 9px;
+}
+
+/* ================= MOTIFS ================= */
+.motif {
+  display: block;
+  width: 100%;
+  color: var(--gold);
+  opacity: 0.3;
+}
+.motif--frieze {
+  height: 22px;
+}
+
+/* Full-width accordion rows use `.card` for its surface treatment, not
+   for the lift-off-the-page hover — a wide bar that hops reads as a
+   glitch rather than as an affordance. */
+.pillar:hover,
+.pillar:focus-within,
+.tl__card:hover,
+.tl__card:focus-within,
+.rstep__card:hover,
+.rstep__card:focus-within {
+  transform: none;
+  box-shadow: var(--shadow-1);
+}
+
+/* ================= CHIPS & LINKS ================= */
+.chip {
+  display: inline-flex;
+  align-items: center;
+  /* 44px — the minimum comfortable thumb target, and this list is the
+     primary control for the map on a phone. */
+  min-height: 44px;
+  padding: 0.35rem 0.95rem;
+  border: 1px solid var(--rule-soft);
+  border-radius: 999px;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  transition: color var(--dur-fast), border-color var(--dur-fast), background var(--dur-fast);
+}
+.chip:hover {
+  color: var(--cream);
+  border-color: var(--rule);
+}
+.chip.is-on {
+  color: var(--ink-900);
+  background: var(--gold);
+  border-color: var(--gold);
+  font-weight: 500;
+}
+.chip--nature.is-on {
+  background: var(--lagoon-soft);
+  border-color: var(--lagoon-soft);
+}
+.chip--heritage.is-on {
+  background: var(--gold-bright);
+  border-color: var(--gold-bright);
+}
+.chip--industry.is-on {
+  background: var(--terracotta);
+  border-color: var(--terracotta);
+  color: var(--cream);
+}
+
+.linkish {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 44px;
+  margin-top: 0.6rem;
+  font-size: 0.78rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--gold);
+  transition: gap var(--dur-fast) var(--ease-out);
+}
+.linkish:hover {
+  gap: 0.8rem;
+}

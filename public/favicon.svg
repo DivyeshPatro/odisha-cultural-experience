@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="Konark wheel">
+  <rect width="64" height="64" rx="12" fill="#0d0a07"/>
+  <g transform="translate(32 32)" fill="none" stroke="#e3a94f" stroke-linecap="round">
+    <circle r="23" stroke-width="2.4"/>
+    <circle r="18.5" stroke-width="1.1"/>
+    <circle r="7.5" stroke-width="1.6"/>
+    <circle r="2.6" fill="#e3a94f" stroke="none"/>
+    <g stroke-width="2.6">
+      <path d="M0-18.5V-7.5M0 7.5V18.5M-18.5 0H-7.5M7.5 0H18.5"/>
+      <path d="M-13.1-13.1 5.3 5.3M13.1-13.1-5.3 5.3M-13.1 13.1 5.3-5.3M13.1 13.1-5.3-5.3" stroke-width="0"/>
+      <path d="M-13.08-13.08-5.3-5.3M13.08-13.08 5.3-5.3M-13.08 13.08-5.3 5.3M13.08 13.08 5.3 5.3"/>
+    </g>
+    <g stroke-width="1">
+      <path d="M-9.44-16.35-3.83-6.63M9.44-16.35 3.83-6.63M-16.35-9.44-6.63-3.83M16.35-9.44 6.63-3.83M-16.35 9.44-6.63 3.83M16.35 9.44 6.63 3.83M-9.44 16.35-3.83 6.63M9.44 16.35 3.83 6.63"/>
+    </g>
+  </g>
+</svg>
