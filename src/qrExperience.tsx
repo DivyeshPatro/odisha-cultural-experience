@@ -231,7 +231,7 @@ function SixtySecondOdisha() {
         </div>
         <button className="minute__control" type="button" onClick={toggle} aria-label={playing ? 'Pause one-minute story' : 'Play one-minute story'}>
           <span aria-hidden="true">{playing ? 'Ⅱ' : '▶'}</span>
-          <span>{playing ? 'Pause' : elapsed >= duration ? 'Again' : elapsed > 0 ? 'Continue' : 'Start the minute'}</span>
+          <span>{playing ? 'Pause' : elapsed >= SIXTY_DURATION ? 'Again' : elapsed > 0 ? 'Continue' : 'Start the minute'}</span>
         </button>
       </section>
 
