@@ -59,6 +59,15 @@ function strikeBell() {
   window.setTimeout(() => void context.close(), 5000)
 }
 
+function getLocalVoice(targetLang: string) {
+  if (!('speechSynthesis' in window)) return null
+  const voices = window.speechSynthesis.getVoices()
+  return voices.find(v => v.lang === targetLang) ||
+         voices.find(v => v.lang === 'en-IN') ||
+         voices.find(v => v.lang.includes('IN')) ||
+         null
+}
+
 function ListenOdisha() {
   const [active, setActive] = useState(0)
   const [speaking, setSpeaking] = useState(false)
@@ -70,7 +79,9 @@ function ListenOdisha() {
     window.speechSynthesis.cancel()
     setActive(index)
     const utterance = new SpeechSynthesisUtterance(PHRASES[index].odia)
-    utterance.lang = 'or-IN'
+    const voice = getLocalVoice('or-IN')
+    if (voice) utterance.voice = voice
+    utterance.lang = voice ? voice.lang : 'or-IN'
     utterance.rate = 0.78
     utterance.volume = 1
     utterance.onstart = () => setSpeaking(true)
@@ -180,7 +191,9 @@ function SixtySecondOdisha() {
     
     window.speechSynthesis.cancel()
     const utterance = new SpeechSynthesisUtterance(`${story.title}. ${story.body}`)
-    utterance.lang = 'or-IN'
+    const voice = getLocalVoice('en-IN')
+    if (voice) utterance.voice = voice
+    utterance.lang = voice ? voice.lang : 'en-IN'
     utterance.rate = 1.25
     utterance.volume = 1.0
     window.speechSynthesis.speak(utterance)
