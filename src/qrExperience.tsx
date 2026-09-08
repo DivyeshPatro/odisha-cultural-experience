@@ -156,6 +156,21 @@ function SixtySecondOdisha() {
     return () => window.clearInterval(timer)
   }, [playing])
 
+  useEffect(() => {
+    if (!playing) {
+      if ('speechSynthesis' in window) window.speechSynthesis.cancel()
+      return
+    }
+    if (!('speechSynthesis' in window)) return
+    
+    window.speechSynthesis.cancel()
+    const utterance = new SpeechSynthesisUtterance(`${story.title}. ${story.body}`)
+    utterance.lang = 'en-IN'
+    utterance.rate = 0.95
+    utterance.volume = 1.0
+    window.speechSynthesis.speak(utterance)
+  }, [active, playing, story.title, story.body])
+
   const toggle = () => {
     if (playing) setPlaying(false)
     else {
