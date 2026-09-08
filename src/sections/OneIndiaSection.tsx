@@ -97,12 +97,7 @@ export function OneIndiaSection() {
           </ul>
 
           <p className="india__wish">
-            <span className="india__tri" aria-hidden="true">
-              <i />
-              <i />
-              <i />
-            </span>
-            Happy Independence Day
+            Discover the Soul of Incredible India
           </p>
           <p className="india__closer">
             <LotusMark size={16} />

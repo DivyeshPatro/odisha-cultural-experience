@@ -94,7 +94,7 @@ export function Hero() {
           <span className="hero__tri" aria-hidden="true">
             <i /> <i /> <i />
           </span>
-          Independence Day 2026 · An interactive exhibition
+          An interactive digital exhibition
         </p>
 
         <h1 className="hero__title">

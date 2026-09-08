@@ -3,7 +3,7 @@
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Odisha — An Interactive Digital Cultural Exhibition. Independence Day 2026.",
+  "description": "Odisha — An Interactive Digital Cultural Exhibition.",
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
@@ -20,7 +20,7 @@
     "@types/react": "^18.3.12",
     "@types/react-dom": "^18.3.1",
     "@vitejs/plugin-react": "^4.3.4",
-    "typescript": "^5.6.3",
+    "typescript": "^5.9.3",
     "vite": "^5.4.11"
   }
 }

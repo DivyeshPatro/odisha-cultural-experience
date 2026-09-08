@@ -31,7 +31,7 @@ export function Footer() {
                 ଓଡ଼ିଶା
               </span>
             </p>
-            <p className="foot__tag">An interactive digital cultural exhibition · Independence Day 2026</p>
+            <p className="foot__tag">An interactive digital cultural exhibition</p>
           </div>
 
           <div className="foot__cols">
@@ -183,7 +183,7 @@ export function Footer() {
         </div>
 
         <p className="foot__legal small">
-          Made for an Independence Day bay decoration. Content is presented for cultural and educational
+          Made to share the vibrant culture of Odisha with the world. Content is presented for cultural and educational
           purposes with sources cited throughout. Corrections are welcome — the data files under{' '}
           <code>src/data/</code> are the single source of truth for every claim on this site.
         </p>

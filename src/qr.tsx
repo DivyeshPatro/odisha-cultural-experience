@@ -30,7 +30,7 @@ function QrDisplay() {
 
       <section className="qrpage__content" aria-labelledby="qr-title">
         <header className="qrpage__intro">
-          <p className="qrpage__eyebrow"><LotusMark size={16} /> Independence Day 2026</p>
+          <p className="qrpage__eyebrow"><LotusMark size={16} /> Odisha Cultural Experience</p>
           <h1 id="qr-title">Odisha</h1>
           <p className="qrpage__odia">ଓଡ଼ିଶା</p>
           <p className="qrpage__line">Four doors into one Odisha.</p>

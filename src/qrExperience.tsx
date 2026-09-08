@@ -18,7 +18,7 @@ function ExperienceShell({ children, tone }: { children: ReactNode; tone: string
         <a href={BASE_URL}>Full exhibition</a>
       </nav>
       {children}
-      <footer className="xfooter"><span>Odisha · India</span><span>Independence Day 2026</span></footer>
+      <footer className="xfooter"><span>Odisha · India</span><span>An Interactive Exhibition</span></footer>
     </main>
   )
 }
