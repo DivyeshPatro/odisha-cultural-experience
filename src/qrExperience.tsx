@@ -165,7 +165,7 @@ function SixtySecondOdisha() {
     
     window.speechSynthesis.cancel()
     const utterance = new SpeechSynthesisUtterance(`${story.title}. ${story.body}`)
-    utterance.lang = 'en-IN'
+    utterance.lang = 'or-IN'
     utterance.rate = 0.95
     utterance.volume = 1.0
     window.speechSynthesis.speak(utterance)
