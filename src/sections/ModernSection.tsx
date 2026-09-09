@@ -1,11 +1,11 @@
 import { useState } from 'react'
 import { Reveal } from '../components/Reveal'
-import { SectionHeader } from '../components/SectionHeader'
+import { ChapterHeader } from '../components/ChapterHeader'
 import { SourceTag } from '../components/SourceTag'
 import { Glyph } from '../components/Glyph'
 import { MODERN_INTRO, MODERN_PILLARS, TENNER_STORY } from '../data/modernOdisha'
+import { useLanguage } from '../context/LanguageContext'
 
-/** The ₹10 note, drawn — the object most people already own without knowing why. */
 function TenNote() {
   return (
     <svg viewBox="0 0 260 132" className="tenner__svg" aria-hidden="true" focusable="false">
@@ -18,7 +18,6 @@ function TenNote() {
       <rect x="2" y="2" width="256" height="128" rx="4" fill="url(#note)" stroke="#a9762c" strokeWidth="1.2" />
       <rect x="10" y="10" width="240" height="112" rx="2" fill="none" stroke="#c9a15c" strokeWidth="0.6" opacity="0.6" />
 
-      {/* the Konark wheel and the horse, as they sit on the reverse */}
       <g transform="translate(150 70)" stroke="#e6c489" fill="none" strokeWidth="1.1">
         <circle r="34" />
         <circle r="29" opacity="0.6" />
@@ -34,7 +33,6 @@ function TenNote() {
         ))}
       </g>
 
-      {/* the chariot horse in profile */}
       <g transform="translate(206 78)" stroke="#e6c489" fill="none" strokeWidth="1" strokeLinecap="round">
         <path d="M-16 18 -12 2 C -10 -6, -4 -10, 4 -10 L 12 -14 L 16 -20 L 20 -14 L 16 -8 C 14 -2, 10 2, 4 4 L 2 18" />
         <path d="M-8 4 -10 18M8 2 10 18" />
@@ -58,16 +56,50 @@ function TenNote() {
 
 export function ModernSection() {
   const [open, setOpen] = useState(MODERN_PILLARS[0].id)
+  const { t } = useLanguage()
 
   return (
     <section id="modern" className="section modern" aria-labelledby="modern-title">
       <div className="wrap">
-        <SectionHeader
+        <ChapterHeader
           numeral="XI"
-          eyebrow="Odisha is not just history"
-          title={<span id="modern-title">Missiles, hockey, ore, and one exported method</span>}
-          lede={MODERN_INTRO}
+          numberStr="11"
+          titleEn="Modern Odisha & Innovation"
+          titleOr="ଆଧୁନିକ ଓଡ଼ିଶା"
+          prologueEn="Missiles, hockey, steel, deepwater ports, and an international disaster-resilience model."
+          prologueOr="ଇସ୍ପାତ, ମହାକାଶ ବିଜ୍ଞାନ, ବନ୍ଦର, ହକି ଏବଂ ପ୍ରଗତିର ନୂତନ ଦିଗନ୍ତ।"
+          accentColor="#ff9933"
         />
+
+        <p className="hero-section__intro-text">{MODERN_INTRO}</p>
+
+        {/* Then → Now → Next Continuum */}
+        <Reveal className="continuum-card card">
+          <p className="eyebrow">{t('CONTINUUM OF PROGRESS', 'ପ୍ରଗତିର ଧାରା')}</p>
+          <h4>{t('THEN → NOW → NEXT', 'ଅତୀତ → ବର୍ତ୍ତମାନ → ଭବିଷ୍ୟତ')}</h4>
+          <div className="continuum-grid">
+            <div className="continuum-step">
+              <span className="continuum-tag">13TH CENTURY</span>
+              <strong>{t('Stone Astronomy', 'ପାଷାଣ ମହାକାଶ ବିଦ୍ୟା')}</strong>
+              <p>{t('Konark Sun Chariot & Temple Engineering', 'କୋଣାର୍କ ସୂର୍ଯ୍ୟ ମନ୍ଦିର ନିର୍ମାଣ ଶୈଳୀ')}</p>
+            </div>
+            <div className="continuum-step">
+              <span className="continuum-tag">1817 - 1936</span>
+              <strong>{t('Statehood & Freedom', 'ସ୍ୱାଧୀନତା ଓ ପ୍ରଦେଶ')}</strong>
+              <p>{t('First linguistic province in India', 'ଭାରତର ପ୍ରଥମ ଭାଷାଭିତ୍ତିକ ପ୍ରଦେଶ')}</p>
+            </div>
+            <div className="continuum-step">
+              <span className="continuum-tag">TODAY</span>
+              <strong>{t('Space & Steel Hub', 'ଇସ୍ପାତ ଓ ବୈଜ୍ଞାନିକ ପ୍ରଗତି')}</strong>
+              <p>{t('Paradip Port, NISER, and Global Hockey', 'ପାରାଦ୍ୱୀପ ବନ୍ଦର ଓ ଗବେଷଣା')}</p>
+            </div>
+            <div className="continuum-step">
+              <span className="continuum-tag">NEXT</span>
+              <strong>{t('Sustainable Future', 'ସୁସ୍ଥାୟୀ ଭବିଷ୍ୟତ')}</strong>
+              <p>{t('Green energy & coastal resilience', 'ସବୁଜ ଶକ୍ତି ଓ ଉପକୂଳ ସୁରକ୍ଷା')}</p>
+            </div>
+          </div>
+        </Reveal>
 
         <div className="modern__pillars">
           {MODERN_PILLARS.map((p, i) => {
@@ -123,8 +155,8 @@ export function ModernSection() {
             <TenNote />
           </div>
           <div className="tenner__text">
-            <p className="eyebrow">The one you already own</p>
-            <h3>Odisha is in almost every wallet in India</h3>
+            <p className="eyebrow">{t('The one you already own', 'ଆପଣଙ୍କ ପାଖରେ ଥିବା ସ୍ମାରକୀ')}</p>
+            <h3>{t('Odisha is in almost every wallet in India', 'ଭାରତର ପ୍ରତ୍ୟେକ ୱାଲେଟ୍‌ରେ ଓଡ଼ିଶା')}</h3>
             <p>{TENNER_STORY.text}</p>
             <SourceTag cite={TENNER_STORY.cite} confidence={TENNER_STORY.confidence} />
           </div>

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ChapterHeader } from '../components/ChapterHeader'
 import { Reveal } from '../components/Reveal'
 import { SectionHeader } from '../components/SectionHeader'
 import { Sheet } from '../components/Sheet'
@@ -92,6 +93,16 @@ export function HeritageSection() {
     <section id="heritage" className="section heritage" aria-labelledby="heritage-title">
       <Frieze className="heritage__frieze" />
       <div className="wrap">
+        <ChapterHeader
+          numberStr="03"
+          numeral="III"
+          titleEn="BUILT HERITAGE"
+          titleOr="ଐତିହାସିକ କୀର୍ତ୍ତିରାଜି"
+          prologueEn="Nine centuries of masons, and one emperor who changed his mind."
+          prologueOr="ଶିଳ୍ପୀଙ୍କ ପ୍ରତିଭା ଓ ପ୍ରାଚୀନ ଓଡ଼ିଶାର କାଳଜୟୀ ସ୍ଥାପତ୍ୟ।"
+          accentColor="var(--terracotta-main)"
+        />
+
         <SectionHeader
           numeral="IV"
           eyebrow="Walk through history"

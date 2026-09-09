@@ -1,4 +1,5 @@
 import { Reveal } from '../components/Reveal'
+import { ChapterHeader } from '../components/ChapterHeader'
 import { SectionHeader } from '../components/SectionHeader'
 import { SourceTag } from '../components/SourceTag'
 import {
@@ -16,6 +17,7 @@ const TONE_LABEL: Record<string, string> = {
 }
 
 export function ResilienceSection() {
+
   return (
     <section id="resilience" className="section section--deep resil" aria-labelledby="resil-title">
       {/* A cyclone spiral, very faint, behind the whole chapter. */}
@@ -34,6 +36,16 @@ export function ResilienceSection() {
       </svg>
 
       <div className="wrap">
+        <ChapterHeader
+          numberStr="09"
+          numeral="IX"
+          titleEn="RESILIENCE & DISASTER MANAGEMENT"
+          titleOr="ଧୈର୍ଯ୍ୟ, ସାହସ ଓ ବିପର୍ଯ୍ୟୟ ପ୍ରଶମନ"
+          prologueEn="From the tragic 1999 Super Cyclone to a global gold standard in disaster preparedness."
+          prologueOr="୧୯୯୯ର ଦୁଃଖଦ ମହାବାତ୍ୟାରୁ ସିଖି ଆଜି ସାରା ବିଶ୍ୱରେ ସିଦ୍ଧି ହାସଲ କରିଥିବା ଓଡ଼ିଶାର ବିପର୍ଯ୍ୟୟ ପ୍ରଶମନ ମଡେଲ।"
+          accentColor="var(--sindoor-main)"
+        />
+
         <SectionHeader
           numeral="X"
           eyebrow="Odisha's superpower"

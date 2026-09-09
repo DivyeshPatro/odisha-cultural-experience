@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ChapterHeader } from '../components/ChapterHeader'
 import { Reveal } from '../components/Reveal'
 import { SectionHeader } from '../components/SectionHeader'
 import { SourceTag } from '../components/SourceTag'
@@ -24,6 +25,16 @@ export function FoodSection() {
   return (
     <section id="food" className="section section--tint food" aria-labelledby="food-title">
       <div className="wrap">
+        <ChapterHeader
+          numberStr="06"
+          numeral="VI"
+          titleEn="CULINARY HERITAGE"
+          titleOr="ଓଡ଼ିଆ ଆହାର"
+          prologueEn="Gentle spicing, mustard paste, fermentations, and ancient earthenware temple kitchens."
+          prologueOr="ସରଳ ସ୍ୱାଦ, ପଖାଳ, ଛେନାପୋଡ଼ ଓ ପୃଥିବୀର ବୃହତ୍ତମ ମନ୍ଦିର ରୋଷେଇଘର।"
+          accentColor="var(--terracotta-main)"
+        />
+
         <SectionHeader
           numeral="VII"
           eyebrow={t('A TASTE OF ODISHA', 'ଓଡ଼ିଆ ଆହାର')}

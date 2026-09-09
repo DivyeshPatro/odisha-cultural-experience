@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { WheelArt } from '../components/KonarkWheel'
 import { Glyph } from '../components/Glyph'
+import { ChapterHeader } from '../components/ChapterHeader'
 import { SectionHeader } from '../components/SectionHeader'
 import { SourceTag } from '../components/SourceTag'
 import { Reveal } from '../components/Reveal'
@@ -59,6 +60,21 @@ export function WheelSection() {
     },
     [reduced, setRot, discover],
   )
+
+  useEffect(() => {
+    const stage = stageRef.current
+    if (!stage) return
+
+    const onWheel = (e: WheelEvent) => {
+      if (Math.abs(e.deltaY) < 12) return
+      e.preventDefault()
+      const dir = e.deltaY > 0 ? 1 : -1
+      goTo((active + dir + WHEEL_SPOKES.length) % WHEEL_SPOKES.length)
+    }
+
+    stage.addEventListener('wheel', onWheel, { passive: false })
+    return () => stage.removeEventListener('wheel', onWheel)
+  }, [active, goTo])
 
   const handleReset = () => {
     goTo(0)
@@ -128,6 +144,16 @@ export function WheelSection() {
   return (
     <section id="wheel" className="section section--tint wheelsec" aria-labelledby="wheel-title">
       <div className="wrap">
+        <ChapterHeader
+          numberStr="02"
+          numeral="II"
+          titleEn="TIME & SOLAR PRECISION"
+          titleOr="ସମୟ ଓ ସୂର୍ଯ୍ୟ ପରିଭ୍ରମଣ"
+          prologueEn="Look closer. This is not mere decoration — it is a 13th-century architectural masterpiece measuring solar movement."
+          prologueOr="ଏହା କେବଳ କାରୁକାର୍ଯ୍ୟ ନୁହେଁ, ପ୍ରାଚୀନ କୋଣାର୍କର ଚକ୍ରରେ ଲୁଚି ରହିଛି ସୂର୍ଯ୍ୟଙ୍କ ଗତି ଓ ସମୟ ଗଣନାର ପ୍ରାଚୀନ ରହସ୍ୟ।"
+          accentColor="var(--gold-main)"
+        />
+
         <SectionHeader
           numeral="II"
           eyebrow={t('READ TIME LIKE THE SUN', 'ସୂର୍ଯ୍ୟ ଘଡ଼ିରେ ସମୟ')}

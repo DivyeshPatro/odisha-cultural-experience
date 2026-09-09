@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ChapterHeader } from '../components/ChapterHeader'
 import { SectionHeader } from '../components/SectionHeader'
 import { Reveal } from '../components/Reveal'
 import { CHILIKA_SHAPE, MAP_NOTE, MAP_VIEWBOX, ODISHA_OUTLINE, PLACES, RIVERS } from '../data/mapPlaces'
@@ -30,6 +31,16 @@ export function LandSection() {
   return (
     <section id="land" className="section landsec" aria-labelledby="land-title">
       <div className="wrap">
+        <ChapterHeader
+          numberStr="01"
+          numeral="I"
+          titleEn="THE LAND"
+          titleOr="ଓଡ଼ିଶାର ଭୂମି"
+          prologueEn="Before stone, there was water. Before monuments, there was movement across coasts, lagoons, and hills."
+          prologueOr="ସମୁଦ୍ର ତଟ, ଚିଲିକା ହ୍ରଦ, ନଦୀ ଉପତ୍ୟକା ଏବଂ ପ୍ରାଚୀନ ପର୍ବତମାଳାର ପ୍ରାକୃତିକ ସମ୍ଭାର।"
+          accentColor="var(--teal-main)"
+        />
+
         <SectionHeader
           numeral="III"
           eyebrow={t('TRAVEL ACROSS ODISHA', 'ଓଡ଼ିଶା ପରିଭ୍ରମଣ')}

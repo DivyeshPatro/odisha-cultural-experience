@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { ChapterHeader } from '../components/ChapterHeader'
 import { Reveal } from '../components/Reveal'
 import { SectionHeader } from '../components/SectionHeader'
 import { Sheet } from '../components/Sheet'
@@ -25,6 +26,16 @@ export function CultureSection() {
     <section id="culture" className="section culture" aria-labelledby="culture-title">
       <BandhaField className="culture__field" opacity={0.04} />
       <div className="wrap">
+        <ChapterHeader
+          numberStr="05"
+          numeral="V"
+          titleEn="ART & LIVING CRAFTS"
+          titleOr="କଳା ଓ ସାଂସ୍କୃତିକ ପରମ୍ପରା"
+          prologueEn="Six master craft traditions still actively practised this afternoon in villages across Odisha."
+          prologueOr="ପଟ୍ଟଚିତ୍ରରୁ ଆରମ୍ଭ କରି ସମ୍ବଲପୁରୀ ଇକତ ଓ ଗୋଟିପୁଅ ନୃତ୍ୟ — ଜୀବନ୍ତ କଳା ସ୍ରୋତ।"
+          accentColor="var(--gold-main)"
+        />
+
         <SectionHeader
           numeral="VI"
           eyebrow={t('Living Traditions & Visual Arts', 'ଜୀବନ୍ତ କଳା ଓ ପରମ୍ପରା')}

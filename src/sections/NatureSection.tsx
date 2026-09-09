@@ -1,4 +1,5 @@
 import { useCallback, useRef, useState } from 'react'
+import { ChapterHeader } from '../components/ChapterHeader'
 import { useReducedMotion } from '../hooks/useReducedMotion'
 import { Reveal } from '../components/Reveal'
 import { SectionHeader } from '../components/SectionHeader'
@@ -111,6 +112,16 @@ export function NatureSection() {
   return (
     <section id="nature" className="section nature" aria-labelledby="nature-title">
       <div className="wrap">
+        <ChapterHeader
+          numberStr="08"
+          numeral="VIII"
+          titleEn="NATURE & ECOSYSTEMS"
+          titleOr="ପ୍ରକୃତି ଓ ଜୈବ ବିବିଧତା"
+          prologueEn="Chilika lagoon, Similipal tiger reserve, Bhitarkanika mangroves, and mass turtle nesting."
+          prologueOr="ଚିଲିକା, ଶିମିଳିପାଳ, ଭିତରକନିକା ଓ ବିଶ୍ୱର ସର୍ବବୃହତ ଅଲିଭ୍ ରିଡଲି କଚ୍ଛପ ସମାଗମ।"
+          accentColor="var(--teal-main)"
+        />
+
         <SectionHeader
           numeral="IX"
           eyebrow="Where land meets sea"

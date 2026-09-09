@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
+import { ChapterHeader } from '../components/ChapterHeader'
 import { Reveal } from '../components/Reveal'
 import { SectionHeader } from '../components/SectionHeader'
 import { SourceTag } from '../components/SourceTag'
@@ -525,6 +526,16 @@ export function FaithSection() {
   return (
     <section id="faith" className="section section--deep faith" aria-labelledby="faith-title">
       <div className="wrap">
+        <ChapterHeader
+          numberStr="04"
+          numeral="IV"
+          titleEn="FAITH & SACRED TRADITIONS"
+          titleOr="ଆସ୍ଥା ଓ ସଂସ୍କୃତି"
+          prologueEn="Three grand wooden chariots built completely from scratch every single year — a living sacred tradition."
+          prologueOr="ପବିତ୍ର ରଥଯାତ୍ରା, ବଂଶାନୁକ୍ରମିକ ରଥ ନିର୍ମାଣ ଓ ଜଗନ୍ନାଥ ସଂସ୍କୃତିର ମହାନ ପରମ୍ପରା।"
+          accentColor="var(--sindoor-main)"
+        />
+
         <SectionHeader
           numeral="V"
           eyebrow="Jagannath"

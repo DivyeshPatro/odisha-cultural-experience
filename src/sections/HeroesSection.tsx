@@ -1,16 +1,13 @@
 import { useState } from 'react'
 import { Reveal } from '../components/Reveal'
-import { SectionHeader } from '../components/SectionHeader'
+import { ChapterHeader } from '../components/ChapterHeader'
+import { LivingOdisha } from '../components/LivingOdisha'
 import { SourceTag } from '../components/SourceTag'
 import { LotusMark } from '../components/Motifs'
 import { HEROES, HEROES_CLOSER, HEROES_INTRO } from '../data/freedomFighters'
+import { useLanguage } from '../context/LanguageContext'
+import { usePassport } from '../hooks/usePassport'
 
-/**
- * An emblem, not a portrait. Rights-cleared photographs of several of
- * these figures are hard to source correctly, and putting the wrong face
- * on a freedom fighter is a worse failure than declining to guess.
- * Each mark is a diya — the lamp lit in remembrance — over the year.
- */
 function Lamp({ tint, lit }: { tint: string; lit: boolean }) {
   return (
     <svg viewBox="0 0 64 64" className={`lamp ${lit ? 'is-lit' : ''}`} aria-hidden="true" focusable="false">
@@ -35,16 +32,29 @@ function Lamp({ tint, lit }: { tint: string; lit: boolean }) {
 
 export function HeroesSection() {
   const [open, setOpen] = useState(HEROES[0].id)
+  const { t } = useLanguage()
+  const { discover } = usePassport()
+
+  const handleToggle = (id: string) => {
+    const next = open === id ? '' : id
+    setOpen(next)
+    if (next) discover('heroes')
+  }
 
   return (
     <section id="heroes" className="section heroes" aria-labelledby="heroes-title">
       <div className="wrap">
-        <SectionHeader
+        <ChapterHeader
           numeral="VIII"
-          eyebrow="Meet its heroes"
-          title={<span id="heroes-title">Odisha did not wait its turn</span>}
-          lede={HEROES_INTRO}
+          numberStr="08"
+          titleEn="People & Resistance"
+          titleOr="ଜନନାୟକ ଓ ସଂଗ୍ରାମ"
+          prologueEn="Four decades before 1857, Odisha’s Paika rebellion struck against British rule. Resistance and reform run continuous across two centuries."
+          prologueOr="୧୮୫୭ ପୂର୍ବରୁ ୧୮୧୭ର ପାଇକ ବିଦ୍ରୋହ। ସ୍ୱାଧୀନତା ସଂଗ୍ରାମର ଏହି ପ୍ରେରଣାଦାୟୀ ଗାଥା।"
+          accentColor="#b8362b"
         />
+
+        <p className="hero-section__intro-text">{HEROES_INTRO}</p>
 
         <ol className="timeline">
           {HEROES.map((h, idx) => {
@@ -62,7 +72,7 @@ export function HeroesSection() {
                     className="tl__head"
                     aria-expanded={isOpen}
                     aria-controls={`tl-body-${h.id}`}
-                    onClick={() => setOpen(isOpen ? '' : h.id)}
+                    onClick={() => handleToggle(h.id)}
                   >
                     <Lamp tint={h.accent} lit={isOpen} />
                     <span className="tl__headtext">
@@ -111,10 +121,26 @@ export function HeroesSection() {
           <SourceTag cite={HEROES_CLOSER.cite} confidence={HEROES_CLOSER.confidence} />
         </Reveal>
 
+        {/* Living Odisha Module */}
+        <Reveal delay={120}>
+          <LivingOdisha />
+          <ChapterHeader
+            numberStr="07"
+            numeral="VII"
+            titleEn="THE PEOPLE"
+            titleOr="ଜନନାୟକ ଓ ପ୍ରତିଭା"
+            prologueEn="Behind stone monuments and sacred traditions are the people who dared, created, defended, and innovated."
+            prologueOr="ପ୍ରାଚୀନ କୀର୍ତ୍ତିରାଜି ଓ ପରମ୍ପରା ପଛରେ ରହିଛନ୍ତି ସେହି ସାହସୀ ସ୍ରଷ୍ଟା, ବିପ୍ଲବୀ ଓ ସାଧକମାନେ।"
+            accentColor="var(--gold-main)"
+          />
+        </Reveal>
+
         <Reveal>
           <p className="heroes__note small">
-            No quotation is attributed to any figure on this page. Where a famous line could not be traced to
-            a reliable source, it was left out rather than invented — which is why there are none.
+            {t(
+              'No quotation is attributed to any figure on this page without verified citation.',
+              'ପ୍ରାମାଣିକ ତଥ୍ୟ ବିନା କୌଣସି ମହାପୁରୁଷଙ୍କ ଉକ୍ତି ସଂଯୋଗ କରାଯାଇନାହିଁ।',
+            )}
           </p>
         </Reveal>
       </div>

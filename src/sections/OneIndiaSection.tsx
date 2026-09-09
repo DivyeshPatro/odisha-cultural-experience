@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Reveal } from '../components/Reveal'
+import { ChapterHeader } from '../components/ChapterHeader'
 import { LotusMark } from '../components/Motifs'
 import { INDIA_STATES, INDIA_VIEWBOX, ODISHA_STATE_ID, THREADS } from '../data/india'
 import { scrollToId } from '../utils/scroll'
@@ -14,6 +15,16 @@ export function OneIndiaSection() {
   return (
     <section id="india" className="section india" aria-labelledby="india-title">
       <div className="wrap">
+        <ChapterHeader
+          numberStr="12"
+          numeral="XII"
+          titleEn="ONE INDIA & THE FUTURE"
+          titleOr="ଏକ ଭାରତ, ଶ୍ରେଷ୍ଠ ଭାରତ"
+          prologueEn="Odisha as a vital pillar of Indian civilisational heritage, modern industry, sports, and future growth."
+          prologueOr="ଭାରତୀୟ ସଂସ୍କୃତିର ଅବିଚ୍ଛେଦ୍ୟ ଅଙ୍ଗ ଏବଂ ଆଗାମୀ ଭବିଷ୍ୟତର ଓଡ଼ିଶା।"
+          accentColor="var(--gold-main)"
+        />
+
         <div className="india__grid">
           <Reveal className="india__mapwrap">
             <svg
