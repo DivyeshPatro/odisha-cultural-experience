@@ -32,8 +32,8 @@ export function LandSection() {
     <section id="land" className="section landsec" aria-labelledby="land-title">
       <div className="wrap">
         <ChapterHeader
-          numberStr="01"
-          numeral="I"
+          numberStr="03"
+          numeral="III"
           titleEn="THE LAND"
           titleOr="ଓଡ଼ିଶାର ଭୂମି"
           prologueEn="Before stone, there was water. Before monuments, there was movement across coasts, lagoons, and hills."
@@ -123,9 +123,19 @@ export function LandSection() {
                     return (
                       <g
                         key={p.id}
+                        role="button"
+                        tabIndex={0}
+                        aria-label={p.name}
+                        aria-pressed={isOpen}
                         className={`odmap__pin odmap__pin--${p.kind} ${isOpen ? 'is-open' : ''}`}
                         transform={`translate(${p.x} ${p.y})`}
                         onClick={() => handleSelectPlace(p.id)}
+                        onKeyDown={(e) => {
+                          if (e.key === 'Enter' || e.key === ' ') {
+                            e.preventDefault()
+                            handleSelectPlace(p.id)
+                          }
+                        }}
                         style={{ cursor: 'pointer' }}
                       >
                         {isOpen && <circle r="17" className="odmap__halo" />}

@@ -37,8 +37,8 @@ export function ResilienceSection() {
 
       <div className="wrap">
         <ChapterHeader
-          numberStr="09"
-          numeral="IX"
+          numberStr="10"
+          numeral="X"
           titleEn="RESILIENCE & DISASTER MANAGEMENT"
           titleOr="ଧୈର୍ଯ୍ୟ, ସାହସ ଓ ବିପର୍ଯ୍ୟୟ ପ୍ରଶମନ"
           prologueEn="From the tragic 1999 Super Cyclone to a global gold standard in disaster preparedness."

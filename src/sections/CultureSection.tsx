@@ -27,8 +27,8 @@ export function CultureSection() {
       <BandhaField className="culture__field" opacity={0.04} />
       <div className="wrap">
         <ChapterHeader
-          numberStr="05"
-          numeral="V"
+          numberStr="06"
+          numeral="VI"
           titleEn="ART & LIVING CRAFTS"
           titleOr="କଳା ଓ ସାଂସ୍କୃତିକ ପରମ୍ପରା"
           prologueEn="Six master craft traditions still actively practised this afternoon in villages across Odisha."

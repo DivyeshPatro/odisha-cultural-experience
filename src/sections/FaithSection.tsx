@@ -527,8 +527,8 @@ export function FaithSection() {
     <section id="faith" className="section section--deep faith" aria-labelledby="faith-title">
       <div className="wrap">
         <ChapterHeader
-          numberStr="04"
-          numeral="IV"
+          numberStr="05"
+          numeral="V"
           titleEn="FAITH & SACRED TRADITIONS"
           titleOr="ଆସ୍ଥା ଓ ସଂସ୍କୃତି"
           prologueEn="Three grand wooden chariots built completely from scratch every single year — a living sacred tradition."

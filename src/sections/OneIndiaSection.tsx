@@ -16,8 +16,8 @@ export function OneIndiaSection() {
     <section id="india" className="section india" aria-labelledby="india-title">
       <div className="wrap">
         <ChapterHeader
-          numberStr="12"
-          numeral="XII"
+          numberStr="13"
+          numeral="XIII"
           titleEn="ONE INDIA & THE FUTURE"
           titleOr="ଏକ ଭାରତ, ଶ୍ରେଷ୍ଠ ଭାରତ"
           prologueEn="Odisha as a vital pillar of Indian civilisational heritage, modern industry, sports, and future growth."

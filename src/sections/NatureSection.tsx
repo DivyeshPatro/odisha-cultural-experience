@@ -113,8 +113,8 @@ export function NatureSection() {
     <section id="nature" className="section nature" aria-labelledby="nature-title">
       <div className="wrap">
         <ChapterHeader
-          numberStr="08"
-          numeral="VIII"
+          numberStr="09"
+          numeral="IX"
           titleEn="NATURE & ECOSYSTEMS"
           titleOr="ପ୍ରକୃତି ଓ ଜୈବ ବିବିଧତା"
           prologueEn="Chilika lagoon, Similipal tiger reserve, Bhitarkanika mangroves, and mass turtle nesting."

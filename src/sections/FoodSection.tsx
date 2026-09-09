@@ -26,8 +26,8 @@ export function FoodSection() {
     <section id="food" className="section section--tint food" aria-labelledby="food-title">
       <div className="wrap">
         <ChapterHeader
-          numberStr="06"
-          numeral="VI"
+          numberStr="07"
+          numeral="VII"
           titleEn="CULINARY HERITAGE"
           titleOr="ଓଡ଼ିଆ ଆହାର"
           prologueEn="Gentle spicing, mustard paste, fermentations, and ancient earthenware temple kitchens."

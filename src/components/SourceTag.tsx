@@ -1,4 +1,5 @@
 import { SOURCES, type Confidence, type SourceKey } from '../data/sources'
+import { useLanguage } from '../context/LanguageContext'
 
 interface Props {
   cite: SourceKey[]
@@ -7,10 +8,10 @@ interface Props {
   align?: 'left' | 'right'
 }
 
-const LABEL: Record<Confidence, string> = {
-  verified: 'Verified',
-  interpretation: 'Interpretation',
-  contested: 'Figures differ',
+const LABEL: Record<Confidence, { en: string; or: string }> = {
+  verified: { en: 'Verified', or: 'ସତ୍ୟାପିତ ତଥ୍ୟ' },
+  interpretation: { en: 'Interpretation', or: 'ବ୍ୟାଖ୍ୟା' },
+  contested: { en: 'Figures differ', or: 'ତଥ୍ୟଗତ ପ୍ରଭେଦ' },
 }
 
 /**
@@ -21,12 +22,13 @@ const LABEL: Record<Confidence, string> = {
  */
 export function SourceTag({ cite, confidence, caveat, align = 'left' }: Props) {
   const sources = cite.map((k) => SOURCES[k]).filter(Boolean)
+  const { t } = useLanguage()
 
   return (
     <details className={`srctag srctag--${confidence} srctag--${align}`}>
       <summary>
         <span className="srctag__dot" aria-hidden="true" />
-        <span>{LABEL[confidence]}</span>
+        <span>{t(LABEL[confidence].en, LABEL[confidence].or)}</span>
         <span className="srctag__count">{sources.length} source{sources.length === 1 ? '' : 's'}</span>
       </summary>
       <div className="srctag__body">

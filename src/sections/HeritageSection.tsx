@@ -94,8 +94,8 @@ export function HeritageSection() {
       <Frieze className="heritage__frieze" />
       <div className="wrap">
         <ChapterHeader
-          numberStr="03"
-          numeral="III"
+          numberStr="04"
+          numeral="IV"
           titleEn="BUILT HERITAGE"
           titleOr="ଐତିହାସିକ କୀର୍ତ୍ତିରାଜି"
           prologueEn="Nine centuries of masons, and one emperor who changed his mind."
