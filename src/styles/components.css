@@ -547,7 +547,7 @@ html[data-present] .hero {
   }
 }
 .chmenu__inner {
-  padding-block: calc(var(--nav-h) + 1.5rem) 3rem;
+  padding-block: calc(var(--nav-h) + 1.5rem) max(3rem, calc(2rem + env(safe-area-inset-bottom, 0px)));
 }
 .chmenu__eyebrow {
   font-size: 0.7rem;
@@ -806,6 +806,7 @@ html[data-present] .hero {
   position: relative;
   width: min(720px, 100%);
   max-height: min(88dvh, 900px);
+  padding-top: env(safe-area-inset-top, 0px);
   display: flex;
   flex-direction: column;
   background: linear-gradient(170deg, #241d16, #100d0a 65%);
@@ -862,7 +863,7 @@ html[data-present] .hero {
 }
 .sheet__close {
   position: absolute;
-  top: 0.55rem;
+  top: max(0.55rem, calc(0.55rem + env(safe-area-inset-top, 0px)));
   right: 0.65rem;
   z-index: 2;
   display: grid;
