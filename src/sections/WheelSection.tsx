@@ -6,16 +6,15 @@ import { SourceTag } from '../components/SourceTag'
 import { Reveal } from '../components/Reveal'
 import { WHEEL_READINGS, WHEEL_SPOKES } from '../data/wheel'
 import { useReducedMotion } from '../hooks/useReducedMotion'
+import { useLanguage } from '../context/LanguageContext'
+import { usePassport } from '../hooks/usePassport'
 import { angleDelta, clamp, scrollToId } from '../utils/scroll'
 
 const STEP = 360 / WHEEL_SPOKES.length // 45°
-const PRESENT_STEP_DURATION = 650
-const PRESENT_SETTLE_DURATION = 500
 
 const indexFromAngle = (deg: number) =>
   ((-Math.round(deg / STEP) % WHEEL_SPOKES.length) + WHEEL_SPOKES.length) % WHEEL_SPOKES.length
 
-/** Nearest angle equivalent to sector `i`, measured from the current angle. */
 const angleForIndex = (i: number, from: number) => {
   const base = -i * STEP
   return base + 360 * Math.round((from - base) / 360)
@@ -25,14 +24,14 @@ export function WheelSection() {
   const reduced = useReducedMotion()
   const stageRef = useRef<HTMLDivElement>(null)
   const rotorRef = useRef<HTMLDivElement>(null)
+  const { t } = useLanguage()
+  const { discover } = usePassport()
 
   const angle = useRef(0)
   const drag = useRef<{ id: number; last: number; t: number; v: number; moved: boolean } | null>(null)
-  const presentationSteps = useRef(0)
 
   const [active, setActive] = useState(0)
   const [touched, setTouched] = useState(false)
-  const [presenting, setPresenting] = useState(false)
 
   const setRot = useCallback((deg: number, animate: boolean) => {
     const rotor = rotorRef.current
@@ -48,53 +47,22 @@ export function WheelSection() {
     setRot(0, false)
   }, [setRot])
 
-  useEffect(() => {
-    const root = document.documentElement
-    const sync = () => {
-      const isWheelStop = root.dataset.presentStop === 'wheel' && root.dataset.presentPage === '1'
-      setPresenting(root.hasAttribute('data-present') && isWheelStop)
-    }
-    const observer = new MutationObserver(sync)
-    sync()
-    observer.observe(root, {
-      attributes: true,
-      attributeFilter: ['data-present', 'data-present-stop', 'data-present-page'],
-    })
-    return () => observer.disconnect()
-  }, [])
-
   const goTo = useCallback(
     (i: number, markTouched = true) => {
       setActive(i)
-      if (markTouched) setTouched(true)
+      if (markTouched) {
+        setTouched(true)
+        discover('konark')
+        discover('wheel')
+      }
       setRot(angleForIndex(i, angle.current), !reduced)
     },
-    [reduced, setRot],
+    [reduced, setRot, discover],
   )
 
-  useEffect(() => {
-    if (!presenting) return
-    presentationSteps.current = 0
-    goTo(0, false)
-    let completionTimer = 0
-    const timer = window.setInterval(() => {
-      if (drag.current) return
-      const next = (indexFromAngle(angle.current) + 1) % WHEEL_SPOKES.length
-      goTo(next, false)
-      presentationSteps.current += 1
-      if (presentationSteps.current === WHEEL_SPOKES.length) {
-        window.clearInterval(timer)
-        completionTimer = window.setTimeout(
-          () => window.dispatchEvent(new Event('odisha:present-next')),
-          PRESENT_SETTLE_DURATION,
-        )
-      }
-    }, PRESENT_STEP_DURATION)
-    return () => {
-      window.clearInterval(timer)
-      window.clearTimeout(completionTimer)
-    }
-  }, [presenting, reduced, goTo])
+  const handleReset = () => {
+    goTo(0)
+  }
 
   /* ---- pointer rotation ------------------------------------------- */
 
@@ -123,14 +91,17 @@ export function WheelSection() {
 
     d.last = a
     d.t = now
-    d.v = delta / dt // deg per ms
+    d.v = delta / dt
+
     if (Math.abs(delta) > 0.4) d.moved = true
 
     setRot(angle.current + delta, false)
-
     const next = indexFromAngle(angle.current)
     setActive((cur) => (cur === next ? cur : next))
-    if (!touched) setTouched(true)
+    if (!touched) {
+      setTouched(true)
+      discover('konark')
+    }
   }
 
   const onUp = (e: React.PointerEvent) => {
@@ -140,62 +111,43 @@ export function WheelSection() {
     try {
       ;(e.currentTarget as HTMLElement).releasePointerCapture(e.pointerId)
     } catch {
-      /* pointer already gone */
+      /* pointer released */
     }
-    if (!d.moved) {
-      const clickedTab = (e.target as Element).closest('.kw__tab')
-      if (!clickedTab) {
-        const next = (indexFromAngle(angle.current) + 1) % WHEEL_SPOKES.length
-        goTo(next)
-      }
-      return
-    }
-
-    // Let the flick carry, then settle on the nearest spoke. Capped so a
-    // hard swipe can't send it spinning for a second and a half.
-    const carry = clamp(d.v * 190, -360, 360)
-    const projected = angle.current + (reduced ? 0 : carry)
+    const projected = angle.current + (reduced ? 0 : clamp(d.v * 190, -360, 360))
     const snapped = Math.round(projected / STEP) * STEP
     setRot(snapped, !reduced)
     setActive(indexFromAngle(snapped))
   }
 
-  /* ---- keyboard ---------------------------------------------------- */
-
-  const onKeyDown = (e: React.KeyboardEvent) => {
-    const n = WHEEL_SPOKES.length
-    let next: number | null = null
-    if (e.key === 'ArrowRight' || e.key === 'ArrowDown') next = (active + 1) % n
-    else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') next = (active - 1 + n) % n
-    else if (e.key === 'Home') next = 0
-    else if (e.key === 'End') next = n - 1
-    if (next === null) return
-    e.preventDefault()
-    goTo(next)
-    stageRef.current?.querySelector<HTMLElement>(`#kw-tab-${next}`)?.focus()
-  }
-
   const spoke = WHEEL_SPOKES[active]
+
+  // Calculate traditional Odia time metrics (Danda = 24 minutes, Pala = 24 seconds)
+  const currentPraharaNum = active + 1
+  const dandaEquivalent = currentPraharaNum * 7.5 // 7.5 Dandas per Prahara
 
   return (
     <section id="wheel" className="section section--tint wheelsec" aria-labelledby="wheel-title">
       <div className="wrap">
         <SectionHeader
           numeral="II"
-          eyebrow="The signature"
+          eyebrow={t('READ TIME LIKE THE SUN', 'ସୂର୍ଯ୍ୟ ଘଡ଼ିରେ ସମୟ')}
           title={
             <span id="wheel-title">
-              Eight spokes. Eight watches of the day. <span className="gold">Turn it.</span>
+              {t('Eight spokes. Eight watches of the day. ', 'ଆଠଟି ଅର। ଦିନର ଆଠଟି ପ୍ରହର। ')}
+              <span className="gold">{t('Turn it.', 'ଏହାକୁ ଘୁରାନ୍ତୁ।')}</span>
             </span>
           }
-          lede="Each of the twenty-four wheels at Konark carries eight major spokes, traditionally read as the eight praharas — the three-hour watches an Indian day is divided into. This exhibition is built on that structure. Tap to advance a spoke, drag to turn, or use the arrow keys."
+          lede={t(
+            'Each of the twenty-four wheels at Konark carries eight major spokes, traditionally read as the eight praharas—the three-hour watches an Indian day is divided into.',
+            'କୋଣାର୍କର ପ୍ରତି ଚକରେ ଆଠଟି ପ୍ରଧାନ ଅର ରହିଛି, ଯାହା ପ୍ରାଚୀନ କାଳରେ ଦିନ ଓ ରାତିର ପ୍ରହର ମାପିବାକୁ ବ୍ୟବହୃତ ହେଉଥିଲା।',
+          )}
         />
 
         <div className="wheelsec__grid">
           <Reveal className="wheelsec__stagewrap">
             <div
               ref={stageRef}
-              className={`kw ${touched ? 'is-touched' : ''} ${presenting ? 'is-presenting' : ''}`}
+              className={`kw ${touched ? 'is-touched' : ''}`}
               onPointerDown={onDown}
               onPointerMove={onMove}
               onPointerUp={onUp}
@@ -215,8 +167,6 @@ export function WheelSection() {
                   className="kw__tabs"
                   role="tablist"
                   aria-label="Chapters of the exhibition"
-                  aria-orientation="horizontal"
-                  onKeyDown={onKeyDown}
                 >
                   {WHEEL_SPOKES.map((s, i) => {
                     const deg = i * STEP
@@ -228,12 +178,7 @@ export function WheelSection() {
                         type="button"
                         aria-selected={i === active}
                         aria-controls="kw-panel"
-                        tabIndex={i === active ? 0 : -1}
                         className={`kw__tab ${i === active ? 'is-active' : ''}`}
-                        // The radius is a length, not a percentage — a
-                        // percentage here would resolve against the 46px
-                        // button, not the wheel, and stack every tab on
-                        // top of the hub.
                         style={{
                           transform: `rotate(${deg}deg) translateY(calc(var(--kw-r) * -1)) rotate(${-deg}deg)`,
                         }}
@@ -250,12 +195,25 @@ export function WheelSection() {
               </div>
 
               <p className={`kw__hint ${touched ? 'is-gone' : ''}`} aria-hidden="true">
-                tap or drag
+                {t('tap or drag', 'ଟ୍ୟାପ୍ କିମ୍ବା ଘୁରାନ୍ତୁ')}
               </p>
+            </div>
+
+            <div className="wheel-reset-wrap">
+              <button type="button" className="btn btn--ghost" onClick={handleReset}>
+                {t('Reset Wheel Position ↺', 'ଚକର ସ୍ଥିତି ପୁନଃସେଟ୍ ↺')}
+              </button>
             </div>
           </Reveal>
 
-          <div className="wheelsec__panel" id="kw-panel" role="tabpanel" aria-labelledby={`kw-tab-${active}`}>
+          <div className="wheelsec__panel" id="kw-panel" role="tabpanel">
+            <div className="wheelsec__solar-meta">
+              <span className="srctag__tier">{t('Solar Calculation', 'ସୌର ମାପ')}</span>
+              <span>
+                {t('Prahara', 'ପ୍ରହର')} {currentPraharaNum} · {dandaEquivalent} {t('Dandas', 'ଦଣ୍ଡ')}
+              </span>
+            </div>
+
             <p className="wheelsec__prahara">{spoke.prahara}</p>
             <h3 className="wheelsec__title">
               {spoke.title}
@@ -265,17 +223,7 @@ export function WheelSection() {
 
             {spoke.target ? (
               <button className="btn wheelsec__go" type="button" onClick={() => scrollToId(spoke.target!)}>
-                Open this chapter
-                <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-                  <path
-                    d="M5 12h14M13 6l6 6-6 6"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
-                </svg>
+                {t('Open this chapter', 'ଏହି ଅଧ୍ୟାୟ ଦେଖନ୍ତୁ')} →
               </button>
             ) : (
               <ul className="wheelsec__readings">
@@ -288,13 +236,6 @@ export function WheelSection() {
                 ))}
               </ul>
             )}
-
-            <p className="wheelsec__count">
-              <span aria-hidden="true">{String(active + 1).padStart(2, '0')}</span>
-              <span className="sr-only">Sector {active + 1}</span>
-              <span className="wheelsec__rule" />
-              <span aria-hidden="true">{String(WHEEL_SPOKES.length).padStart(2, '0')}</span>
-            </p>
           </div>
         </div>
       </div>

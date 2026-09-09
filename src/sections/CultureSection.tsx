@@ -5,21 +5,30 @@ import { Sheet } from '../components/Sheet'
 import { SourceTag } from '../components/SourceTag'
 import { ArtPlate } from '../components/Plates'
 import { BandhaField, SauraBand } from '../components/Motifs'
+import { PattachitraLab } from '../components/PattachitraLab'
+import { IkatLab } from '../components/IkatLab'
 import { ART_FORMS, ART_INTRO, type ArtForm } from '../data/art'
+import { useLanguage } from '../context/LanguageContext'
+import { usePassport } from '../hooks/usePassport'
 
 export function CultureSection() {
   const [open, setOpen] = useState<ArtForm | null>(null)
+  const { t } = useLanguage()
+  const { discover } = usePassport()
+
+  const handleOpenCard = (a: ArtForm) => {
+    setOpen(a)
+    discover(a.id)
+  }
 
   return (
     <section id="culture" className="section culture" aria-labelledby="culture-title">
-      {/* A bandha weave behind the chapter, at 4% — present as texture,
-          never as pattern competing with the text. */}
       <BandhaField className="culture__field" opacity={0.04} />
       <div className="wrap">
         <SectionHeader
           numeral="VI"
-          eyebrow="Feel the culture"
-          title={<span id="culture-title">Six traditions still being practised this afternoon</span>}
+          eyebrow={t('Living Traditions & Visual Arts', 'ଜୀବନ୍ତ କଳା ଓ ପରମ୍ପରା')}
+          title={<span id="culture-title">{t('Six traditions still being practised this afternoon', 'ଆଜି ବି ଜୀବନ୍ତ ଛଅଟି ଶ୍ରେଷ୍ଠ କଳା ପରମ୍ପରା')}</span>}
           lede={ART_INTRO}
         />
 
@@ -30,7 +39,7 @@ export function CultureSection() {
                 type="button"
                 className="acard card"
                 style={{ ['--acc' as string]: a.accent }}
-                onClick={() => setOpen(a)}
+                onClick={() => handleOpenCard(a)}
                 aria-haspopup="dialog"
               >
                 <span className="acard__plate">
@@ -53,11 +62,19 @@ export function CultureSection() {
           ))}
         </ul>
 
+        {/* Interactive Pattachitra Lab & Ikat Weaving Studio */}
+        <Reveal className="culture__labs-wrap" delay={150}>
+          <PattachitraLab />
+          <IkatLab />
+        </Reveal>
+
         <Reveal className="culture__band">
           <SauraBand className="culture__saura" />
           <p className="culture__bandcap small">
-            Saura iditals are painted on the walls of homes in southern Odisha for a birth, a harvest or a
-            marriage. The figures are drawn joined, inward from the frame.
+            {t(
+              'Saura iditals are painted on the walls of homes in southern Odisha for a birth, a harvest or a marriage.',
+              'ଦକ୍ଷିଣ ଓଡ଼ିଶାରେ ସୌରା ଇଡିତାଲ୍ ଘର ଭିତ୍ତିରେ ଜନ୍ମ, ଅମଳ କିମ୍ବା ବିବାହ ସମୟରେ ଅଙ୍କାଯାଏ।',
+            )}
           </p>
         </Reveal>
       </div>
@@ -75,11 +92,11 @@ export function CultureSection() {
               <ArtPlate name={open.plate} accent={open.accent} />
             </div>
             <p className="sheetbody__hook">{open.hook}</p>
-            <h4>Where it comes from</h4>
+            <h4>{t('Where it comes from', 'ଉତ୍ପତ୍ତି ସ୍ଥଳ')}</h4>
             <p>{open.origin}</p>
-            <h4>Why it matters</h4>
+            <h4>{t('Why it matters', 'ଏହାର ମହତ୍ତ୍ୱ')}</h4>
             <p>{open.why}</p>
-            <h4>Today</h4>
+            <h4>{t('Today', 'ଆଜିର ସ୍ଥିତି')}</h4>
             <p>{open.today}</p>
             <SourceTag cite={open.cite} confidence={open.confidence} caveat={open.caveat} />
           </div>

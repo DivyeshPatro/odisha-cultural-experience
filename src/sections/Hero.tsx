@@ -1,23 +1,7 @@
 import { TempleSilhouette } from '../components/Motifs'
 import { MAP_VIEWBOX, ODISHA_OUTLINE, ODISHA_PATH_LENGTH } from '../data/mapPlaces'
+import { useLanguage } from '../context/LanguageContext'
 import { scrollToId } from '../utils/scroll'
-
-/* ------------------------------------------------------------------
-   THE FIRST TEN SECONDS
-
-   Someone has just scanned a code on an office wall. The whole
-   sequence resolves in under two seconds and is built from four
-   layers, back to front:
-
-     1. a slowly turning Konark wheel, huge and mostly off-frame
-     2. the outline of Odisha, drawn on by a dashoffset sweep
-     3. the temple skyline along the bottom edge
-     4. the title
-
-   Everything is CSS. No canvas, no WebGL, no image request — so the
-   hero is painted from markup already in the HTML response and there
-   is nothing to wait for.
--------------------------------------------------------------------*/
 
 const MOTES = Array.from({ length: 14 }, (_, i) => ({
   left: `${(i * 37 + 11) % 97}%`,
@@ -27,7 +11,13 @@ const MOTES = Array.from({ length: 14 }, (_, i) => ({
   drift: `${((i % 5) - 2) * 22}px`,
 }))
 
-export function Hero() {
+interface HeroProps {
+  onStartJourney?: () => void
+}
+
+export function Hero({ onStartJourney }: HeroProps) {
+  const { t } = useLanguage()
+
   return (
     <header className="hero" id="top">
       <div className="hero__bg" aria-hidden="true">
@@ -54,9 +44,7 @@ export function Hero() {
           </g>
         </svg>
 
-        {/* 2 — Odisha, drawing itself. The dash length is the real
-            measured perimeter of the outline, so the sweep starts
-            fully hidden and finishes exactly closed. */}
+        {/* 2 — Odisha, drawing itself */}
         <svg
           className="hero__map"
           viewBox={MAP_VIEWBOX}
@@ -94,7 +82,7 @@ export function Hero() {
           <span className="hero__tri" aria-hidden="true">
             <i /> <i /> <i />
           </span>
-          An interactive digital exhibition
+          {t('An interactive digital exhibition', 'ଏକ ଆକର୍ଷଣୀୟ ଡିଜିଟାଲ ପ୍ରଦର୍ଶନୀ')}
         </p>
 
         <h1 className="hero__title">
@@ -111,35 +99,45 @@ export function Hero() {
         </h1>
 
         <p className="hero__sub">
-          Where stone learned <span className="gold">to keep time</span>
+          {t('Where stone learned', 'ଯେଉଁଠି ପାଷାଣ')} <span className="gold">{t('to keep time', 'ସମୟ ଶିଖିଲା')}</span>
         </p>
 
         <p className="hero__lede">
-          A thirteenth-century king built the sun a chariot and left it on the coast. Eight hundred years
-          later the same state taught the world how to move a million people out of a cyclone's path in a
-          day. Both of those are Odisha. So is everything in between.
+          {t(
+            'A thirteenth-century king built the sun a chariot in stone. Eight hundred years later the same state taught the world how to move a million people out of a cyclone\'s path in a day. Both of those are Odisha.',
+            'ତ୍ରୟୋଦଶ ଶତାବ୍ଦୀର ଶାସକ ସୂର୍ଯ୍ୟଙ୍କ ପାଇଁ ପାଷାଣ ରଥ ଗଢ଼ିଥିଲେ। ଆଠ ଶହ ବର୍ଷ ପରେ ଏହି ମାଟି ବିପର୍ଯ୍ୟୟ ପରିଚାଳନାରେ ବିଶ୍ୱରେ ଉଦାହରଣ ସୃଷ୍ଟି କଲା।',
+          )}
         </p>
 
         <div className="hero__cta">
-          <button className="btn" type="button" onClick={() => scrollToId('sixty')}>
-            Discover Odisha
-            <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
-              <path
-                d="M12 5v14M6 13l6 6 6-6"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
+          {onStartJourney ? (
+            <button className="btn" type="button" onClick={onStartJourney}>
+              {t('BEGIN THE JOURNEY', 'ଯାତ୍ରା ଆରମ୍ଭ କରନ୍ତୁ')}
+              <svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true">
+                <path
+                  d="M12 5v14M6 13l6 6 6-6"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="1.8"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
+          ) : (
+            <button className="btn" type="button" onClick={() => scrollToId('sixty')}>
+              {t('Discover Odisha', 'ଓଡ଼ିଶା ଆବିଷ୍କାର କରନ୍ତୁ')}
+            </button>
+          )}
+
           <button className="btn btn--ghost" type="button" onClick={() => scrollToId('wheel')}>
-            Turn the wheel
+            {t('Explore Odisha ↓', 'ଓଡ଼ିଶା ଦେଖନ୍ତୁ ↓')}
           </button>
         </div>
 
-        <p className="hero__meta small">Twelve chapters · about eight minutes · sound optional</p>
+        <p className="hero__meta small">
+          {t('Twelve chapters · about eight minutes · sound optional', '୧୨ଟି ଅଧ୍ୟାୟ · ପ୍ରାୟ ୮ ମିନିଟ୍ · ଶବ୍ଦ ଇଚ୍ଛାଧୀନ')}
+        </p>
       </div>
     </header>
   )

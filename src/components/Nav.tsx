@@ -3,18 +3,25 @@ import { CHAPTERS, PRIMARY_NAV } from '../data/nav'
 import { useActiveSection } from '../hooks/useActiveSection'
 import { useScrollLock } from '../hooks/useScrollLock'
 import { useAmbience } from '../hooks/useAmbience'
+import { useLanguage } from '../context/LanguageContext'
 import { scrollToId } from '../utils/scroll'
 import { LotusMark } from './Motifs'
 import { PresentMode } from './PresentMode'
 
 const IDS = CHAPTERS.map((c) => c.id)
 
-export function Nav() {
+interface NavProps {
+  onStartJourney?: () => void
+  onToggleKiosk?: () => void
+}
+
+export function Nav({ onStartJourney, onToggleKiosk }: NavProps) {
   const [open, setOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
   const [progress, setProgress] = useState(0)
   const active = useActiveSection(IDS)
   const audio = useAmbience()
+  const { lang, toggleLang } = useLanguage()
 
   useScrollLock(open)
 
@@ -49,7 +56,6 @@ export function Nav() {
 
   const go = (id: string) => {
     setOpen(false)
-    // Let the overlay unmount and the scroll lock release first.
     requestAnimationFrame(() => scrollToId(id))
   }
 
@@ -91,11 +97,45 @@ export function Nav() {
           </ul>
 
           <div className="nav__tools">
+            {/* Language Switcher */}
+            <button
+              type="button"
+              className="nav__lang"
+              onClick={toggleLang}
+              title={lang === 'en' ? 'Switch to Odia' : 'Switch to English'}
+            >
+              <span className="odia">{lang === 'en' ? 'ଓଡ଼ିଶା' : 'EN'}</span>
+            </button>
+
+            {/* Guided Journey Mode button */}
+            {onStartJourney && (
+              <button
+                type="button"
+                className="nav__journey"
+                onClick={onStartJourney}
+                title="Begin guided 8-minute exhibition tour"
+              >
+                <span>Journey</span>
+              </button>
+            )}
+
+            {onToggleKiosk && (
+              <button
+                type="button"
+                className="nav__lang"
+                onClick={onToggleKiosk}
+                title="Toggle Exhibition Kiosk Mode"
+              >
+                <span>Kiosk</span>
+              </button>
+            )}
+
             <PresentMode
               soundSupported={audio.supported}
               startSound={audio.start}
               stopSound={audio.stop}
             />
+
             {audio.supported && (
               <button
                 type="button"

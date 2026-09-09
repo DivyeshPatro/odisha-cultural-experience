@@ -4,15 +4,20 @@ import { SectionHeader } from '../components/SectionHeader'
 import { SourceTag } from '../components/SourceTag'
 import { FoodPlate } from '../components/Plates'
 import { DISHES, FOOD_INTRO, MAHAPRASAD_NOTE } from '../data/food'
+import { useLanguage } from '../context/LanguageContext'
+import { usePassport } from '../hooks/usePassport'
 
-/**
- * A carousel of dishes on a turning stand. The selected dish sits at the
- * front; the others are ranged behind it in a shallow arc. Selection is
- * driven by real buttons, so it works on a keyboard and reads correctly
- * to a screen reader — the arc is purely visual.
- */
 export function FoodSection() {
   const [i, setI] = useState(0)
+  const [filterPreference, setFilterPreference] = useState<string>('all')
+  const { t } = useLanguage()
+  const { discover } = usePassport()
+
+  const handleSelectDish = (idx: number) => {
+    setI(idx)
+    discover(DISHES[idx].id)
+  }
+
   const dish = DISHES[i]
   const n = DISHES.length
 
@@ -21,15 +26,59 @@ export function FoodSection() {
       <div className="wrap">
         <SectionHeader
           numeral="VII"
-          eyebrow="A taste of Odisha"
-          title={<span id="food-title">Not the Indian food you have eaten</span>}
+          eyebrow={t('A TASTE OF ODISHA', 'ଓଡ଼ିଆ ଆହାର')}
+          title={<span id="food-title">{t('Not the Indian food you have eaten', 'ଶୁଦ୍ଧ ଦେଶୀ ସ୍ୱାଦ ଓ ପରମ୍ପରା')}</span>}
           lede={FOOD_INTRO}
         />
+
+        {/* Preference Discovery Assistant */}
+        <div className="food__pref-bar">
+          <span className="food__pref-label">{t('I WANT...', 'ମୁଁ ଖୋଜୁଛି...')}</span>
+          <button
+            type="button"
+            className={`chip ${filterPreference === 'all' ? 'is-on' : ''}`}
+            onClick={() => setFilterPreference('all')}
+          >
+            {t('All Dishes', 'ସମସ୍ତ ଆହାର')}
+          </button>
+          <button
+            type="button"
+            className={`chip ${filterPreference === 'sweet' ? 'is-on' : ''}`}
+            onClick={() => {
+              setFilterPreference('sweet')
+              const sweetIdx = DISHES.findIndex((d) => d.id === 'chhena-poda' || d.id === 'rasagola')
+              if (sweetIdx !== -1) handleSelectDish(sweetIdx)
+            }}
+          >
+            {t('Something Sweet', 'ମିଠା')}
+          </button>
+          <button
+            type="button"
+            className={`chip ${filterPreference === 'cooling' ? 'is-on' : ''}`}
+            onClick={() => {
+              setFilterPreference('cooling')
+              const coolIdx = DISHES.findIndex((d) => d.id === 'pakhala')
+              if (coolIdx !== -1) handleSelectDish(coolIdx)
+            }}
+          >
+            {t('Something Cooling', 'ଶୀତଳ')}
+          </button>
+          <button
+            type="button"
+            className={`chip ${filterPreference === 'festive' ? 'is-on' : ''}`}
+            onClick={() => {
+              setFilterPreference('festive')
+              const festIdx = DISHES.findIndex((d) => d.id === 'mahaprasad')
+              if (festIdx !== -1) handleSelectDish(festIdx)
+            }}
+          >
+            {t('Festive / Sacred', 'ପବିତ୍ର')}
+          </button>
+        </div>
 
         <div className="food__stage">
           <div className="food__carousel" aria-hidden="true">
             {DISHES.map((d, k) => {
-              // shortest signed distance around the ring
               let off = k - i
               if (off > n / 2) off -= n
               if (off < -n / 2) off += n
@@ -65,7 +114,7 @@ export function FoodSection() {
 
             <div className="food__cols">
               <div>
-                <h4>In it</h4>
+                <h4>{t('Ingredients', 'ସାମଗ୍ରୀ')}</h4>
                 <ul className="food__ing">
                   {dish.ingredients.map((ing) => (
                     <li key={ing}>{ing}</li>
@@ -73,9 +122,9 @@ export function FoodSection() {
                 </ul>
               </div>
               <div>
-                <h4>When</h4>
+                <h4>{t('When', 'କେବେ')}</h4>
                 <p>{dish.when}</p>
-                <h4>Where</h4>
+                <h4>{t('Where', 'କେଉଁଠି')}</h4>
                 <p>{dish.where}</p>
               </div>
             </div>
@@ -94,11 +143,7 @@ export function FoodSection() {
               tabIndex={k === i ? 0 : -1}
               className={`food__pick ${k === i ? 'is-on' : ''}`}
               style={{ ['--acc' as string]: d.accent }}
-              onClick={() => setI(k)}
-              onKeyDown={(e) => {
-                if (e.key === 'ArrowRight') setI((v) => (v + 1) % n)
-                if (e.key === 'ArrowLeft') setI((v) => (v - 1 + n) % n)
-              }}
+              onClick={() => handleSelectDish(k)}
             >
               {d.name}
             </button>
