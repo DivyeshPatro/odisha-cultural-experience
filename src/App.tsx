@@ -22,7 +22,7 @@ import { MoreExperiencesSection } from './sections/MoreExperiencesSection'
 import { Footer } from './sections/Footer'
 import { useActiveSection } from './hooks/useActiveSection'
 import { CHAPTERS } from './data/nav'
-import { useAmbience } from './hooks/useAmbience'
+import { AmbienceProvider, useAmbience } from './hooks/useAmbience'
 
 const IDS = CHAPTERS.map((c) => c.id)
 
@@ -76,7 +76,10 @@ function ExhibitionContent() {
 export default function App() {
   return (
     <LanguageProvider>
-      <ExhibitionContent />
+      <AmbienceProvider>
+        <ExhibitionContent />
+      </AmbienceProvider>
     </LanguageProvider>
   )
 }
+

@@ -142,6 +142,7 @@ export function Nav({ onStartJourney, onToggleKiosk }: NavProps) {
                 className={`nav__sound ${audio.playing ? 'is-on' : ''}`}
                 onClick={audio.toggle}
                 aria-pressed={audio.playing}
+                aria-label={audio.playing ? 'Mute exhibition sound' : 'Unmute exhibition sound'}
                 title={audio.playing ? 'Stop sound' : 'Play the sea and a temple bell'}
               >
                 <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">

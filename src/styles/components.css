@@ -1270,8 +1270,24 @@ html[data-present] .hero {
   align-items: center;
 }
 @media (max-width: 768px) {
+  .patta-lab {
+    padding: 1.25rem;
+  }
+  .patta-lab__sub {
+    margin-bottom: 1rem;
+  }
   .patta-lab__grid {
     grid-template-columns: 1fr;
+    gap: 1.1rem;
+  }
+  .patta-lab__group {
+    margin-bottom: 0.85rem;
+  }
+  .patta-lab__stage {
+    margin-top: 0.2rem;
+  }
+  .patta-canvas {
+    width: min(260px, 88vw);
   }
 }
 .patta-lab__group {
@@ -1297,6 +1313,12 @@ html[data-present] .hero {
   font-size: 0.76rem;
   color: var(--text-dim);
   background: rgba(255, 255, 255, 0.03);
+  cursor: pointer;
+  transition: border-color var(--dur-fast), background-color var(--dur-fast), color var(--dur-fast);
+}
+.patta-btn:focus-visible {
+  outline: 2px solid var(--gold);
+  outline-offset: 2px;
 }
 .patta-btn.is-active {
   border-color: var(--gold);
@@ -1313,6 +1335,11 @@ html[data-present] .hero {
   border-radius: 50%;
   border: 2px solid transparent;
   cursor: pointer;
+  transition: transform var(--dur-fast), border-color var(--dur-fast);
+}
+.patta-swatch:focus-visible {
+  outline: 2px solid var(--gold-bright);
+  outline-offset: 3px;
 }
 .patta-swatch.is-active {
   border-color: var(--cream);

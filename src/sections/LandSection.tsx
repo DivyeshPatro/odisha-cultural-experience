@@ -138,8 +138,8 @@ export function LandSection() {
                         }}
                         style={{ cursor: 'pointer' }}
                       >
-                        {/* Invisible 44x44 CSS px (r=22) hit area to meet touch target guidelines without visual clutter */}
-                        <circle r="22" fill="transparent" pointerEvents="all" aria-hidden="true" />
+                        {/* Invisible 52x52 viewBox units (width/height 52) hit area target ensuring >=44x44 CSS px bounding box */}
+                        <rect x="-26" y="-26" width="52" height="52" fill="transparent" pointerEvents="all" aria-hidden="true" />
                         {isOpen && <circle r="17" className="odmap__halo" />}
                         <circle r="4.6" className="odmap__dot" />
                         <text

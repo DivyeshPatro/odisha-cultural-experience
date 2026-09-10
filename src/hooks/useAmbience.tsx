@@ -1,39 +1,30 @@
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react'
 
 /* ------------------------------------------------------------------
    SOUND, WITHOUT ASSETS
 
-   The brief asked for an optional sound layer but forbade shipping
-   audio we cannot license. So nothing is downloaded: both sounds are
-   synthesised in the browser with the Web Audio API.
+   Synthesised in the browser with the Web Audio API:
+     ocean — white noise through a low-pass filter with LFO modulation.
+     bell  — additive synthesis on inharmonic partials.
 
-     ocean  — white noise through a low-pass filter whose cutoff and
-              gain are pushed around by two slow, mutually detuned
-              oscillators, which is what makes a wash sound like surf
-              rather than like static.
-
-     bell   — additive synthesis on inharmonic partials (1, 2.76, 5.40,
-              8.93 × f0). Those ratios are roughly why a struck bell
-              sounds like a bell and a struck string does not, and the
-              partials decay at different rates so the tone thins as it
-              rings out.
-
-   Total cost: no network request, a few hundred bytes of code, and an
-   AudioContext that is not created at all until the visitor asks for it.
-   It never autoplays.
+   Configured to start with sound ON by default. Autoplay restrictions
+   are handled by resuming the AudioContext upon the visitor's first
+   interaction if default sound state is ON.
 -------------------------------------------------------------------*/
 
-interface Ambience {
+export interface Ambience {
   supported: boolean
   playing: boolean
   start: () => void
   stop: () => void
   toggle: () => void
-  strike: () => void
+  strike: (f0?: number) => void
 }
 
-export function useAmbience(): Ambience {
-  const [playing, setPlaying] = useState(false)
+const AmbienceContext = createContext<Ambience | undefined>(undefined)
+
+export function AmbienceProvider({ children }: { children: ReactNode }) {
+  const [playing, setPlaying] = useState(true)
   const [supported] = useState(
     () => typeof window !== 'undefined' && !!(window.AudioContext || (window as any).webkitAudioContext),
   )
@@ -41,7 +32,7 @@ export function useAmbience(): Ambience {
   const ctxRef = useRef<AudioContext | null>(null)
   const masterRef = useRef<GainNode | null>(null)
   const surfRef = useRef<{ stop: () => void } | null>(null)
-  const playingRef = useRef(false)
+  const playingRef = useRef(true)
   const bellTimerRef = useRef(0)
 
   const getCtx = useCallback(() => {
@@ -59,13 +50,12 @@ export function useAmbience(): Ambience {
 
   const strike = useCallback(
     (f0 = 262) => {
-      if (!supported) return
+      if (!supported || !playingRef.current) return
       const ctx = getCtx()
       const master = masterRef.current!
       if (ctx.state === 'suspended') void ctx.resume()
 
       const t = ctx.currentTime
-      // Inharmonic partials, with the higher ones dying off faster.
       const partials: [ratio: number, gain: number, decay: number][] = [
         [1.0, 0.5, 5.2],
         [2.76, 0.32, 3.1],
@@ -76,7 +66,7 @@ export function useAmbience(): Ambience {
 
       const bus = ctx.createGain()
       bus.gain.value = 1.0
-      bus.connect(master.gain.value > 0 ? master : ctx.destination)
+      bus.connect(master)
 
       for (const [ratio, g, decay] of partials) {
         const osc = ctx.createOscillator()
@@ -99,8 +89,13 @@ export function useAmbience(): Ambience {
     const master = masterRef.current!
     if (ctx.state === 'suspended') void ctx.resume()
 
-    // Two seconds of noise, looped. Long enough that the loop point is
-    // inaudible once it is filtered this heavily.
+    if (surfRef.current) {
+      master.gain.cancelScheduledValues(ctx.currentTime)
+      master.gain.setValueAtTime(master.gain.value, ctx.currentTime)
+      master.gain.linearRampToValueAtTime(0.80, ctx.currentTime + 1.2)
+      return
+    }
+
     const seconds = 2
     const buf = ctx.createBuffer(1, ctx.sampleRate * seconds, ctx.sampleRate)
     const data = buf.getChannelData(0)
@@ -118,8 +113,6 @@ export function useAmbience(): Ambience {
     const swell = ctx.createGain()
     swell.gain.value = 0.55
 
-    // Two slow LFOs at incommensurate rates: the wash never repeats
-    // audibly, which is the whole trick.
     const lfoA = ctx.createOscillator()
     const lfoAGain = ctx.createGain()
     lfoA.frequency.value = 0.07
@@ -146,7 +139,7 @@ export function useAmbience(): Ambience {
         const now = ctx.currentTime
         master.gain.cancelScheduledValues(now)
         master.gain.setValueAtTime(master.gain.value, now)
-        master.gain.linearRampToValueAtTime(0, now + 0.7)
+        master.gain.linearRampToValueAtTime(0, now + 0.4)
         window.setTimeout(() => {
           try {
             src.stop()
@@ -155,13 +148,14 @@ export function useAmbience(): Ambience {
           } catch {
             /* already stopped */
           }
-        }, 900)
+          surfRef.current = null
+        }, 500)
       },
     }
   }, [getCtx])
 
   const start = useCallback(() => {
-    if (!supported || playingRef.current) return
+    if (!supported) return
     playingRef.current = true
     startSurf()
     bellTimerRef.current = window.setTimeout(() => strike(), 260)
@@ -169,41 +163,46 @@ export function useAmbience(): Ambience {
   }, [startSurf, strike, supported])
 
   const stop = useCallback(() => {
-    if (!playingRef.current) return
     playingRef.current = false
     window.clearTimeout(bellTimerRef.current)
+    if (masterRef.current && ctxRef.current) {
+      const ctx = ctxRef.current
+      const now = ctx.currentTime
+      masterRef.current.gain.cancelScheduledValues(now)
+      masterRef.current.gain.setValueAtTime(masterRef.current.gain.value, now)
+      masterRef.current.gain.linearRampToValueAtTime(0, now + 0.3)
+    }
     surfRef.current?.stop()
     surfRef.current = null
     setPlaying(false)
   }, [])
 
   const toggle = useCallback(() => {
-    if (playingRef.current) stop()
-    else start()
+    if (playingRef.current) {
+      stop()
+    } else {
+      start()
+    }
   }, [start, stop])
 
-  // Pause when the tab is hidden. Sound following you to another tab is
-  // the fastest way to make someone hate a website.
   useEffect(() => {
     const onVis = () => {
       const ctx = ctxRef.current
       if (!ctx) return
       if (document.hidden) void ctx.suspend()
-      else if (playing) void ctx.resume()
+      else if (playingRef.current) void ctx.resume()
     }
     document.addEventListener('visibilitychange', onVis)
     return () => document.removeEventListener('visibilitychange', onVis)
-  }, [playing])
+  }, [])
 
-  // Automatically start audio on the first user interaction
   useEffect(() => {
     if (!supported) return
     const onInteract = () => {
-      start()
-      document.removeEventListener('click', onInteract)
-      document.removeEventListener('scroll', onInteract)
-      document.removeEventListener('touchstart', onInteract)
-      document.removeEventListener('keydown', onInteract)
+      if (playingRef.current) {
+        startSurf()
+        bellTimerRef.current = window.setTimeout(() => strike(), 260)
+      }
     }
     document.addEventListener('click', onInteract, { once: true })
     document.addEventListener('scroll', onInteract, { once: true })
@@ -215,7 +214,7 @@ export function useAmbience(): Ambience {
       document.removeEventListener('touchstart', onInteract)
       document.removeEventListener('keydown', onInteract)
     }
-  }, [supported, start])
+  }, [supported, startSurf, strike])
 
   useEffect(
     () => () => {
@@ -226,5 +225,25 @@ export function useAmbience(): Ambience {
     [],
   )
 
-  return { supported, playing, start, stop, toggle, strike: () => strike() }
+  return (
+    <AmbienceContext.Provider value={{ supported, playing, start, stop, toggle, strike }}>
+      {children}
+    </AmbienceContext.Provider>
+  )
 }
+
+export function useAmbience(): Ambience {
+  const context = useContext(AmbienceContext)
+  if (!context) {
+    return {
+      supported: false,
+      playing: false,
+      start: () => {},
+      stop: () => {},
+      toggle: () => {},
+      strike: () => {},
+    }
+  }
+  return context
+}
+
