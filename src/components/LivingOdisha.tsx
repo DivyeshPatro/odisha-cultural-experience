@@ -93,7 +93,7 @@ export function LivingOdisha() {
         <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', flexWrap: 'wrap', marginBottom: '0.4rem' }}>
           <span className="eyebrow">{t('LIVING ODISHA', 'ଜୀବନ୍ତ ଓଡ଼ିଶା')}</span>
           <span className="chip" style={{ fontSize: '0.68rem', padding: '0.15rem 0.5rem', minHeight: 'auto', opacity: 0.85 }}>
-            {t('Cultural Archetypes', 'ପ୍ରତିନିଧିମୂଳକ କଳାକାର')}
+            {t('Cultural Archetypes', 'ପ୍ରତିନିଧିମୂଳକ ବ୍ୟକ୍ତିତ୍ୱ')}
           </span>
         </div>
         <h3>{t('The People Behind the Culture', 'କଳା ଓ ସଂସ୍କୃତିର ଜୀବନ୍ତ କାରିଗର')}</h3>

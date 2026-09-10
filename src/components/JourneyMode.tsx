@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { useLanguage } from '../context/LanguageContext'
 import { scrollToId } from '../utils/scroll'
 
@@ -7,6 +7,9 @@ interface JourneyModeProps {
   onClose: () => void
   onStrikeBell?: () => void
 }
+
+const FOCUSABLE =
+  'a[href], button:not([disabled]), summary, input, select, textarea, [tabindex]:not([tabindex="-1"])'
 
 const JOURNEY_STEPS = [
   {
@@ -98,9 +101,55 @@ const JOURNEY_STEPS = [
 export function JourneyMode({ isOpen, onClose, onStrikeBell }: JourneyModeProps) {
   const [stepIndex, setStepIndex] = useState(0)
   const [isPlaying, setIsPlaying] = useState(true)
+  const panelRef = useRef<HTMLDivElement>(null)
+  const restoreTo = useRef<HTMLElement | null>(null)
   const { t } = useLanguage()
 
   const current = JOURNEY_STEPS[stepIndex]
+
+  const closeRef = useRef(onClose)
+  useEffect(() => {
+    closeRef.current = onClose
+  }, [onClose])
+
+  // Save element that opened modal; move focus in on open & restore focus on close
+  useEffect(() => {
+    if (!isOpen) return
+    restoreTo.current = document.activeElement as HTMLElement
+    panelRef.current?.querySelector<HTMLElement>('.journey-modal__close')?.focus()
+    return () => restoreTo.current?.focus?.()
+  }, [isOpen])
+
+  // Escape key to dismiss; Tab key focus trap inside modal
+  useEffect(() => {
+    if (!isOpen) return
+    const panel = panelRef.current
+
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        e.stopPropagation()
+        closeRef.current()
+        return
+      }
+      if (e.key !== 'Tab' || !panel) return
+      const items = Array.from(panel.querySelectorAll<HTMLElement>(FOCUSABLE)).filter(
+        (el) => el.offsetParent !== null,
+      )
+      if (!items.length) return
+      const first = items[0]
+      const last = items[items.length - 1]
+      if (e.shiftKey && document.activeElement === first) {
+        e.preventDefault()
+        last.focus()
+      } else if (!e.shiftKey && document.activeElement === last) {
+        e.preventDefault()
+        first.focus()
+      }
+    }
+
+    document.addEventListener('keydown', onKey, true)
+    return () => document.removeEventListener('keydown', onKey, true)
+  }, [isOpen])
 
   useEffect(() => {
     if (!isOpen || !isPlaying) return
@@ -137,7 +186,7 @@ export function JourneyMode({ isOpen, onClose, onStrikeBell }: JourneyModeProps)
   return (
     <div className="journey-modal" role="dialog" aria-modal="true" aria-label="Guided Exhibition Journey">
       <div className="journey-modal__scrim" onClick={onClose} />
-      <div className="journey-modal__panel" style={{ '--j-accent': current.accent } as React.CSSProperties}>
+      <div ref={panelRef} className="journey-modal__panel" style={{ '--j-accent': current.accent } as React.CSSProperties}>
         <header className="journey-modal__head">
           <div className="journey-modal__kicker">
             <span className="journey-modal__badge">JOURNEY MODE</span>
